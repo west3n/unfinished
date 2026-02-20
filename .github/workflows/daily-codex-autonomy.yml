@@ -1,0 +1,123 @@
+name: Daily Codex Autonomy
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-codex-autonomy
+  cancel-in-progress: false
+
+jobs:
+  evolve:
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.AUTONOMY_GH_TOKEN || github.token }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Codex CLI
+        run: npm install -g @openai/codex
+
+      - name: Resolve run date
+        id: meta
+        run: echo "today=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Run Codex autonomy
+        env:
+          TODAY: ${{ steps.meta.outputs.today }}
+        run: |
+          set -euo pipefail
+          export OPENAI_API_KEY="$(printf '%s' "${OPENAI_API_KEY}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+
+          if [ -z "${OPENAI_API_KEY}" ]; then
+            echo "OPENAI_API_KEY is empty in Run Codex step."
+            exit 1
+          fi
+
+          if codex login --help >/tmp/codex_login_help.txt 2>&1; then
+            if grep -q -- "--with-api-key" /tmp/codex_login_help.txt; then
+              printf '%s' "${OPENAI_API_KEY}" | codex login --with-api-key
+            elif grep -q -- "--api-key" /tmp/codex_login_help.txt; then
+              codex login --api-key "${OPENAI_API_KEY}"
+            else
+              echo "codex login flags not detected; continuing with env auth."
+            fi
+          else
+            echo "codex login command unavailable; continuing with env auth."
+          fi
+
+          PROMPT="$(cat AUTONOMY_PROMPT.md)"
+          PROMPT="${PROMPT}
+
+          Current date (UTC): ${TODAY}
+          Repository: ${GITHUB_REPOSITORY}
+          Trigger: ${GITHUB_EVENT_NAME}
+          Apply edits directly in the checked-out repository."
+
+          if codex exec --help 2>/dev/null | grep -q -- "--full-auto"; then
+            codex exec --full-auto "${PROMPT}"
+          else
+            codex exec "${PROMPT}"
+          fi
+
+      - name: Capture daily screenshot
+        env:
+          TODAY: ${{ steps.meta.outputs.today }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p screenshots
+
+          python3 -m http.server 4173 >/tmp/unfinished-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill ${SERVER_PID} >/dev/null 2>&1 || true' EXIT
+
+          for i in $(seq 1 30); do
+            if curl -fsS "http://127.0.0.1:4173/index.html" >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          npx -y playwright@1.52.0 install chromium
+          npx -y playwright@1.52.0 screenshot \
+            --device="Desktop Chrome" \
+            --full-page \
+            --wait-for-timeout=2000 \
+            "http://127.0.0.1:4173/index.html" \
+            "screenshots/${TODAY}.png"
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes."
+            exit 0
+          fi
+
+          BRANCH="${{ github.event.repository.default_branch }}"
+          BRANCH="${BRANCH:-main}"
+
+          git config user.name "west3n"
+          git config user.email "mirosshnikov@gmail.com"
+
+          git add -A
+          git commit -m "autonomy: daily evolution ${{ steps.meta.outputs.today }}"
+
+          git fetch origin "${BRANCH}"
+          git rebase "origin/${BRANCH}"
+          git push origin "HEAD:${BRANCH}"

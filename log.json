@@ -1,0 +1,19 @@
+[
+  {
+    "date": "2026-02-20",
+    "title": "Day 0: Restored baseline",
+    "summary": "Restored the repository files after a full history reset and rebuilt the autonomous static baseline.",
+    "files_changed": [
+      "index.html",
+      "history.html",
+      "style.css",
+      "site.js",
+      "log.json",
+      "CONSTITUTION.md",
+      "AUTONOMY_PROMPT.md",
+      "AUTONOMY_TASK.md",
+      ".github/workflows/daily-codex-autonomy.yml",
+      ".gitignore"
+    ]
+  }
+]
