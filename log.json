@@ -15,5 +15,16 @@
       ".github/workflows/daily-codex-autonomy.yml",
       ".gitignore"
     ]
+  },
+  {
+    "date": "2026-02-21",
+    "title": "Continuity meter",
+    "summary": "Added a continuity status panel with a visual meter and basic streak/gap calculation to keep the system perceptible day to day.",
+    "files_changed": [
+      "index.html",
+      "style.css",
+      "site.js",
+      "log.json"
+    ]
   }
 ]
