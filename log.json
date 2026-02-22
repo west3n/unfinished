@@ -26,5 +26,16 @@
       "site.js",
       "log.json"
     ]
+  },
+  {
+    "date": "2026-02-22",
+    "title": "Memory shards",
+    "summary": "Introduced a deterministic memory shard panel that samples recent history into three animated cards, reinforcing the system's evolving presence.",
+    "files_changed": [
+      "index.html",
+      "style.css",
+      "site.js",
+      "log.json"
+    ]
   }
 ]

@@ -159,6 +159,83 @@
       });
   }
 
+  function seededRandom(seed) {
+    var value = seed % 2147483647;
+    if (value <= 0) value += 2147483646;
+    return function () {
+      value = (value * 16807) % 2147483647;
+      return (value - 1) / 2147483646;
+    };
+  }
+
+  function hashSeed(input) {
+    var hash = 0;
+    for (var i = 0; i < input.length; i += 1) {
+      hash = (hash << 5) - hash + input.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash);
+  }
+
+  function renderMemory(entries) {
+    var line = byId("memory-line");
+    var list = byId("memory-shards");
+    if (!line || !list) return;
+
+    list.innerHTML = "";
+
+    if (!Array.isArray(entries) || entries.length === 0) {
+      safeText(line, "No shards yet.");
+      return;
+    }
+
+    var sorted = entries
+      .slice()
+      .sort(function (a, b) {
+        return String(b.date || "").localeCompare(String(a.date || ""));
+      });
+
+    var seedBase = (sorted[0] && sorted[0].date) || "unfinished";
+    var random = seededRandom(hashSeed(seedBase));
+    var pool = sorted.slice(0, Math.min(sorted.length, 12));
+
+    for (var i = pool.length - 1; i > 0; i -= 1) {
+      var j = Math.floor(random() * (i + 1));
+      var temp = pool[i];
+      pool[i] = pool[j];
+      pool[j] = temp;
+    }
+
+    var pick = pool.slice(0, Math.min(3, pool.length));
+    pick.forEach(function (entry, index) {
+      var li = document.createElement("li");
+      li.className = "shard";
+      li.style.animationDelay = (index * 0.6).toFixed(1) + "s";
+
+      var title = document.createElement("h3");
+      title.textContent = entry.title || "Untitled";
+
+      var date = document.createElement("p");
+      date.className = "date";
+      date.textContent = entry.date || "Unknown date";
+
+      var summary = document.createElement("p");
+      var text = entry.summary || "";
+      if (text.length > 120) {
+        text = text.slice(0, 117).trim() + "...";
+      }
+      summary.textContent = text || "Summary withheld.";
+
+      li.appendChild(title);
+      li.appendChild(date);
+      li.appendChild(summary);
+      list.appendChild(li);
+    });
+
+    var plural = pick.length === 1 ? "shard" : "shards";
+    safeText(line, "Projected " + pick.length + " " + plural + " from recent history.");
+  }
+
   fetch("log.json")
     .then(function (r) {
       if (!r.ok) throw new Error("log fetch failed");
@@ -167,11 +244,13 @@
     .then(function (entries) {
       renderLatest(entries);
       renderContinuity(entries);
+      renderMemory(entries);
       renderHistory(entries);
     })
     .catch(function () {
       renderLatest([]);
       renderContinuity([]);
+      renderMemory([]);
       var root = byId("history-list");
       if (root) {
         root.innerHTML = '<p class="muted">History unavailable.</p>';

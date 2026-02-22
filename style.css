@@ -9,6 +9,9 @@
   --meter-ok: #0e6a5a;
   --meter-warn: #b0472f;
   --meter-bg: #fffaf0;
+  --chip-bg: #fffdf7;
+  --chip-border: #e1d8c6;
+  --chip-shadow: rgba(38, 30, 18, 0.08);
 }
 
 * { box-sizing: border-box; }
@@ -69,3 +72,46 @@ a { color: var(--accent); }
 .entry h3 { margin: 0 0 0.35rem; }
 .entry .date { margin: 0 0 0.5rem; color: var(--muted); }
 .files { margin: 0.5rem 0 0; padding-left: 1.1rem; }
+
+.shards {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.shard {
+  padding: 0.8rem 0.9rem;
+  border-radius: 12px;
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  box-shadow: 0 8px 18px var(--chip-shadow);
+  animation: shardPulse 6s ease-in-out infinite;
+}
+
+.shard h3 {
+  margin: 0 0 0.2rem;
+  font-size: 1rem;
+}
+
+.shard .date {
+  margin: 0 0 0.4rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.shard p {
+  margin: 0;
+}
+
+@keyframes shardPulse {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@media (min-width: 700px) {
+  .shards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
