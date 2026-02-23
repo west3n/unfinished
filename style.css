@@ -105,6 +105,34 @@ a { color: var(--accent); }
   margin: 0;
 }
 
+.metrics {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.metric {
+  padding: 0.75rem 0.9rem;
+  border-radius: 14px;
+  background: linear-gradient(140deg, #fffdf5, #f4efe4);
+  border: 1px solid var(--chip-border);
+  box-shadow: 0 10px 20px rgba(58, 44, 24, 0.08);
+}
+
+.metric-label {
+  margin: 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.metric-value {
+  margin: 0.35rem 0 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
 @keyframes shardPulse {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-2px); }
@@ -113,5 +141,9 @@ a { color: var(--accent); }
 @media (min-width: 700px) {
   .shards {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

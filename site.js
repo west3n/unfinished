@@ -37,6 +37,36 @@
       .slice(0, 10);
   }
 
+  function getUniqueDays(entries) {
+    return entries
+      .map(function (entry) {
+        return String(entry.date || "").slice(0, 10);
+      })
+      .filter(function (value, index, array) {
+        return value && array.indexOf(value) === index;
+      })
+      .sort();
+  }
+
+  function computeStreaks(days) {
+    if (!days.length) return { current: 0, longest: 0 };
+    var longest = 1;
+    var current = 1;
+    for (var i = 1; i < days.length; i += 1) {
+      var prev = new Date(days[i - 1] + "T00:00:00Z");
+      var curr = new Date(days[i] + "T00:00:00Z");
+      var delta = Math.floor((curr - prev) / 86400000);
+      if (delta === 1) {
+        current += 1;
+      } else {
+        if (current > longest) longest = current;
+        current = 1;
+      }
+    }
+    if (current > longest) longest = current;
+    return { current: current, longest: longest };
+  }
+
   function renderContinuity(entries) {
     var status = byId("continuity-status");
     var detail = byId("continuity-detail");
@@ -51,14 +81,7 @@
       return;
     }
 
-    var days = entries
-      .map(function (entry) {
-        return String(entry.date || "").slice(0, 10);
-      })
-      .filter(function (value, index, array) {
-        return value && array.indexOf(value) === index;
-      })
-      .sort();
+    var days = getUniqueDays(entries);
 
     var today = toDayString(new Date());
     var latest = days[days.length - 1] || "";
@@ -71,17 +94,8 @@
       gapDays = Math.max(0, diff);
     }
 
-    var streak = 1;
-    for (var i = days.length - 2; i >= 0; i -= 1) {
-      var prev = new Date(days[i + 1] + "T00:00:00Z");
-      var curr = new Date(days[i] + "T00:00:00Z");
-      var delta = Math.floor((prev - curr) / 86400000);
-      if (delta === 1) {
-        streak += 1;
-      } else {
-        break;
-      }
-    }
+    var streaks = computeStreaks(days);
+    var streak = streaks.current;
 
     var meter = Math.min(100, Math.round((streak / Math.max(3, days.length)) * 100));
     bar.style.width = meter + "%";
@@ -236,6 +250,44 @@
     safeText(line, "Projected " + pick.length + " " + plural + " from recent history.");
   }
 
+  function renderPulse(entries) {
+    var summary = byId("pulse-summary");
+    var entriesEl = byId("metric-entries");
+    var daysEl = byId("metric-days");
+    var streakEl = byId("metric-streak");
+    var originEl = byId("metric-origin");
+    if (!summary || !entriesEl || !daysEl || !streakEl || !originEl) return;
+
+    if (!Array.isArray(entries) || entries.length === 0) {
+      safeText(summary, "No measurable pulse yet.");
+      safeText(entriesEl, "0");
+      safeText(daysEl, "0");
+      safeText(streakEl, "0");
+      safeText(originEl, "--");
+      return;
+    }
+
+    var totalEntries = entries.length;
+    var days = getUniqueDays(entries);
+    var first = days[0];
+    var latest = days[days.length - 1];
+    var streaks = computeStreaks(days);
+    var today = toDayString(new Date());
+    var originSpan = 0;
+
+    if (first) {
+      var originDate = new Date(first + "T00:00:00Z");
+      var todayDate = new Date(today + "T00:00:00Z");
+      originSpan = Math.max(0, Math.floor((todayDate - originDate) / 86400000));
+    }
+
+    safeText(summary, "Tracking from " + (first || "unknown") + " through " + (latest || "unknown") + ".");
+    safeText(entriesEl, String(totalEntries));
+    safeText(daysEl, String(days.length));
+    safeText(streakEl, String(streaks.longest));
+    safeText(originEl, String(originSpan));
+  }
+
   fetch("log.json")
     .then(function (r) {
       if (!r.ok) throw new Error("log fetch failed");
@@ -245,12 +297,14 @@
       renderLatest(entries);
       renderContinuity(entries);
       renderMemory(entries);
+      renderPulse(entries);
       renderHistory(entries);
     })
     .catch(function () {
       renderLatest([]);
       renderContinuity([]);
       renderMemory([]);
+      renderPulse([]);
       var root = byId("history-list");
       if (root) {
         root.innerHTML = '<p class="muted">History unavailable.</p>';

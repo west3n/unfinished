@@ -33,6 +33,29 @@
       <p id="memory-line" class="muted">Loading...</p>
       <ul id="memory-shards" class="shards"></ul>
     </section>
+
+    <section id="pulse" class="panel" aria-live="polite">
+      <h2>System pulse</h2>
+      <p id="pulse-summary" class="muted">Loading...</p>
+      <div class="metrics" role="list">
+        <div class="metric" role="listitem">
+          <p class="metric-label">Entries</p>
+          <p id="metric-entries" class="metric-value">--</p>
+        </div>
+        <div class="metric" role="listitem">
+          <p class="metric-label">Active days</p>
+          <p id="metric-days" class="metric-value">--</p>
+        </div>
+        <div class="metric" role="listitem">
+          <p class="metric-label">Longest streak</p>
+          <p id="metric-streak" class="metric-value">--</p>
+        </div>
+        <div class="metric" role="listitem">
+          <p class="metric-label">Days since origin</p>
+          <p id="metric-origin" class="metric-value">--</p>
+        </div>
+      </div>
+    </section>
   </main>
   <script src="site.js"></script>
 </body>

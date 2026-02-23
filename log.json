@@ -37,5 +37,16 @@
       "site.js",
       "log.json"
     ]
+  },
+  {
+    "date": "2026-02-23",
+    "title": "System pulse metrics",
+    "summary": "Added a system pulse panel that quantifies entries, active days, longest streak, and days since origin to make the evolution's heartbeat visible.",
+    "files_changed": [
+      "index.html",
+      "style.css",
+      "site.js",
+      "log.json"
+    ]
   }
 ]
