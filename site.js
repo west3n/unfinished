@@ -288,6 +288,85 @@
     safeText(originEl, String(originSpan));
   }
 
+  function describeVolatility(entry) {
+    var files = Array.isArray(entry.files_changed) ? entry.files_changed.length : 0;
+    if (files >= 6) return "High";
+    if (files >= 3) return "Medium";
+    if (files > 0) return "Low";
+    return "Trace";
+  }
+
+  function renderDrift(entries) {
+    var summary = byId("drift-summary");
+    var list = byId("drift-list");
+    if (!summary || !list) return;
+
+    list.innerHTML = "";
+
+    if (!Array.isArray(entries) || entries.length === 0) {
+      safeText(summary, "No drift to measure yet.");
+      return;
+    }
+
+    var sorted = entries
+      .slice()
+      .sort(function (a, b) {
+        return String(b.date || "").localeCompare(String(a.date || ""));
+      });
+
+    var latest = sorted[0];
+    var recentWindow = sorted.slice(0, Math.min(sorted.length, 7));
+    var totalChanges = recentWindow.reduce(function (sum, entry) {
+      var count = Array.isArray(entry.files_changed) ? entry.files_changed.length : 0;
+      return sum + count;
+    }, 0);
+    var averageChanges = recentWindow.length ? (totalChanges / recentWindow.length).toFixed(1) : "0";
+
+    safeText(
+      summary,
+      "Scanning last " +
+        recentWindow.length +
+        " entries. Avg files changed: " +
+        averageChanges +
+        ". Latest anchor: " +
+        (latest && latest.date ? latest.date : "unknown") +
+        "."
+    );
+
+    recentWindow.forEach(function (entry, index) {
+      var item = document.createElement("li");
+      item.className = "drift-item";
+      item.style.animationDelay = (index * 0.4).toFixed(1) + "s";
+
+      var title = document.createElement("h3");
+      title.textContent = entry.title || "Untitled";
+
+      var meta = document.createElement("p");
+      meta.className = "drift-meta";
+      var filesCount = Array.isArray(entry.files_changed) ? entry.files_changed.length : 0;
+      meta.textContent =
+        "Date: " +
+        (entry.date || "Unknown") +
+        " · Files: " +
+        filesCount +
+        " · Drift: " +
+        describeVolatility(entry);
+
+      var body = document.createElement("p");
+      body.className = "drift-body";
+      var summaryText = entry.summary || "";
+      if (summaryText.length > 140) {
+        summaryText = summaryText.slice(0, 137).trim() + "...";
+      }
+      body.textContent = summaryText || "Signal muted.";
+
+      item.appendChild(title);
+      item.appendChild(meta);
+      item.appendChild(body);
+      list.appendChild(item);
+    });
+  }
+
   fetch("log.json")
     .then(function (r) {
       if (!r.ok) throw new Error("log fetch failed");
@@ -297,6 +376,7 @@
       renderLatest(entries);
       renderContinuity(entries);
       renderMemory(entries);
+      renderDrift(entries);
       renderPulse(entries);
       renderHistory(entries);
     })
@@ -304,6 +384,7 @@
       renderLatest([]);
       renderContinuity([]);
       renderMemory([]);
+      renderDrift([]);
       renderPulse([]);
       var root = byId("history-list");
       if (root) {

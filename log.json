@@ -48,5 +48,16 @@
       "site.js",
       "log.json"
     ]
+  },
+  {
+    "date": "2026-02-24",
+    "title": "Temporal drift ledger",
+    "summary": "Added a temporal drift panel that samples recent entries, gauges volatility by changed files, and surfaces an average change rate to keep evolution legible.",
+    "files_changed": [
+      "index.html",
+      "style.css",
+      "site.js",
+      "log.json"
+    ]
   }
 ]
