@@ -111,6 +111,33 @@ a { color: var(--accent); }
   margin-top: 0.8rem;
 }
 
+.forecast {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.forecast-item {
+  padding: 0.85rem 0.95rem;
+  border-radius: 14px;
+  border: 1px solid var(--chip-border);
+  background: linear-gradient(140deg, #fef8e8, #efe5d0);
+  box-shadow: 0 10px 18px rgba(64, 50, 28, 0.1);
+}
+
+.forecast-item h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.02rem;
+}
+
+.forecast-meta {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
 .drift {
   list-style: none;
   margin: 0.6rem 0 0;
@@ -194,6 +221,10 @@ a { color: var(--accent); }
 
   .metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .forecast {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .drift {

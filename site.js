@@ -288,6 +288,79 @@
     safeText(originEl, String(originSpan));
   }
 
+  function addDays(dayString, days) {
+    var date = new Date(dayString + "T00:00:00Z");
+    date.setUTCDate(date.getUTCDate() + days);
+    return date.toISOString().slice(0, 10);
+  }
+
+  function renderForecast(entries) {
+    var summary = byId("forecast-summary");
+    var list = byId("forecast-list");
+    if (!summary || !list) return;
+
+    list.innerHTML = "";
+
+    if (!Array.isArray(entries) || entries.length === 0) {
+      safeText(summary, "No trajectory yet.");
+      return;
+    }
+
+    var days = getUniqueDays(entries);
+    if (!days.length) {
+      safeText(summary, "No trajectory yet.");
+      return;
+    }
+
+    var diffs = [];
+    for (var i = 1; i < days.length; i += 1) {
+      var prev = new Date(days[i - 1] + "T00:00:00Z");
+      var curr = new Date(days[i] + "T00:00:00Z");
+      var delta = Math.floor((curr - prev) / 86400000);
+      if (delta > 0) diffs.push(delta);
+    }
+
+    var avg = diffs.length
+      ? diffs.reduce(function (sum, value) { return sum + value; }, 0) / diffs.length
+      : 1;
+    var cadence = Math.max(1, Math.round(avg));
+    var latest = days[days.length - 1];
+    var today = toDayString(new Date());
+    var latestDate = new Date(latest + "T00:00:00Z");
+    var todayDate = new Date(today + "T00:00:00Z");
+    var gap = Math.max(0, Math.floor((todayDate - latestDate) / 86400000));
+    var risk = gap > cadence ? "Drifting" : gap === 0 ? "Aligned" : "Holding";
+
+    safeText(
+      summary,
+      "Cadence: ~" +
+        cadence +
+        " day(s). Last entry: " +
+        latest +
+        ". Today: " +
+        today +
+        ". Status: " +
+        risk +
+        "."
+    );
+
+    for (var step = 1; step <= 3; step += 1) {
+      var item = document.createElement("li");
+      item.className = "forecast-item";
+
+      var title = document.createElement("h3");
+      title.textContent = "Projection " + step;
+
+      var meta = document.createElement("p");
+      meta.className = "forecast-meta";
+      meta.textContent = "Projected date: " + addDays(latest, cadence * step);
+
+      item.appendChild(title);
+      item.appendChild(meta);
+      list.appendChild(item);
+    }
+  }
+
   function describeVolatility(entry) {
     var files = Array.isArray(entry.files_changed) ? entry.files_changed.length : 0;
     if (files >= 6) return "High";
@@ -377,6 +450,7 @@
       renderContinuity(entries);
       renderMemory(entries);
       renderDrift(entries);
+      renderForecast(entries);
       renderPulse(entries);
       renderHistory(entries);
     })
@@ -385,6 +459,7 @@
       renderContinuity([]);
       renderMemory([]);
       renderDrift([]);
+      renderForecast([]);
       renderPulse([]);
       var root = byId("history-list");
       if (root) {

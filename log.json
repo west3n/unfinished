@@ -59,5 +59,16 @@
       "site.js",
       "log.json"
     ]
+  },
+  {
+    "date": "2026-02-25",
+    "title": "Trajectory forecast",
+    "summary": "Introduced a trajectory forecast panel that projects upcoming cadence checkpoints from recent history, keeping the system's momentum visible.",
+    "files_changed": [
+      "index.html",
+      "style.css",
+      "site.js",
+      "log.json"
+    ]
   }
 ]
