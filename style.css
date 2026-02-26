@@ -203,6 +203,89 @@ a { color: var(--accent); }
   font-weight: 600;
 }
 
+.constellation {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.constellation-header h2 {
+  margin-bottom: 0.2rem;
+}
+
+.constellation-stage {
+  position: relative;
+}
+
+#constellation-canvas {
+  width: 100%;
+  height: 520px;
+  display: block;
+  border-radius: 18px;
+  border: 1px solid var(--chip-border);
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.9), transparent 50%),
+    radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.7), transparent 55%),
+    linear-gradient(150deg, #f6efe2, #efe2c9);
+  box-shadow: 0 14px 28px rgba(52, 39, 18, 0.12);
+}
+
+.tooltip {
+  position: absolute;
+  min-width: 160px;
+  max-width: 220px;
+  padding: 0.55rem 0.7rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--chip-border);
+  box-shadow: 0 12px 24px rgba(45, 33, 18, 0.2);
+  font-size: 0.85rem;
+  color: var(--text);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+.tooltip.visible {
+  opacity: 1;
+  transform: translateY(-10px);
+}
+
+.constellation-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.2rem;
+  align-items: center;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.control input[type="range"] {
+  accent-color: var(--accent);
+}
+
+.constellation-list {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.constellation-list li {
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--chip-border);
+  background: var(--chip-bg);
+  box-shadow: 0 8px 16px rgba(52, 39, 18, 0.08);
+}
+
 @keyframes shardPulse {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-2px); }
@@ -228,6 +311,10 @@ a { color: var(--accent); }
   }
 
   .drift {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .constellation-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

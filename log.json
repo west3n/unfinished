@@ -70,5 +70,18 @@
       "site.js",
       "log.json"
     ]
+  },
+  {
+    "date": "2026-02-26",
+    "title": "Constellation memory map",
+    "summary": "Added a new constellation page that spatializes the evolution log into a canvas-based star map with interactive nodes, tooltips, and controls for density and labels.",
+    "files_changed": [
+      "constellation.html",
+      "index.html",
+      "history.html",
+      "style.css",
+      "site.js",
+      "log.json"
+    ]
   }
 ]

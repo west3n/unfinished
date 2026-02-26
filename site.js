@@ -7,6 +7,10 @@
     if (node) node.textContent = value;
   }
 
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
   function renderLatest(entries) {
     var title = byId("latest-title");
     var summary = byId("latest-summary");
@@ -440,6 +444,223 @@
     });
   }
 
+  function renderConstellation(entries) {
+    var canvas = byId("constellation-canvas");
+    if (!canvas) return;
+
+    var tooltip = byId("constellation-tooltip");
+    var summary = byId("constellation-summary");
+    var list = byId("constellation-list");
+    var labelToggle = byId("constellation-labels");
+    var spacingInput = byId("constellation-spacing");
+
+    if (!summary || !list) return;
+
+    list.innerHTML = "";
+
+    if (!Array.isArray(entries) || entries.length === 0) {
+      safeText(summary, "No entries yet.");
+      if (tooltip) tooltip.classList.remove("visible");
+      return;
+    }
+
+    var sorted = entries
+      .slice()
+      .sort(function (a, b) {
+        return String(a.date || "").localeCompare(String(b.date || ""));
+      });
+
+    var latest = sorted[sorted.length - 1];
+    var earliest = sorted[0];
+    safeText(
+      summary,
+      "Mapped " +
+        sorted.length +
+        " entries from " +
+        (earliest && earliest.date ? earliest.date : "unknown") +
+        " to " +
+        (latest && latest.date ? latest.date : "unknown") +
+        "."
+    );
+
+    var recent = sorted.slice(-6).reverse();
+    recent.forEach(function (entry) {
+      var item = document.createElement("li");
+      var title = document.createElement("strong");
+      title.textContent = entry.title || "Untitled";
+      var meta = document.createElement("span");
+      meta.className = "muted";
+      meta.textContent = " · " + (entry.date || "Unknown");
+      item.appendChild(title);
+      item.appendChild(meta);
+      list.appendChild(item);
+    });
+
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    var stage = canvas.parentElement;
+    var dpr = window.devicePixelRatio || 1;
+    var nodes = [];
+
+    function buildNodes() {
+      var width = canvas.clientWidth || 600;
+      var height = canvas.clientHeight || 420;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      var pad = 36;
+      var spacing = spacingInput ? Number(spacingInput.value) : 24;
+      var seed = sorted
+        .map(function (entry) { return entry.date || "unknown"; })
+        .join("|");
+      var random = seededRandom(hashSeed(seed));
+      nodes = [];
+
+      sorted.forEach(function (entry, index) {
+        var progress = sorted.length > 1 ? index / (sorted.length - 1) : 0.5;
+        var x = pad + (width - pad * 2) * progress;
+        var filesCount = Array.isArray(entry.files_changed) ? entry.files_changed.length : 0;
+        var radius = clamp(6 + filesCount * 1.8, 6, 18);
+        var y = pad + random() * (height - pad * 2);
+        var tries = 0;
+        while (tries < 20) {
+          var clear = true;
+          for (var i = 0; i < nodes.length; i += 1) {
+            var existing = nodes[i];
+            var dx = existing.x - x;
+            var dy = existing.y - y;
+            var distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < spacing + radius + existing.radius) {
+              clear = false;
+              break;
+            }
+          }
+          if (clear) break;
+          y = pad + random() * (height - pad * 2);
+          tries += 1;
+        }
+        nodes.push({
+          entry: entry,
+          x: x,
+          y: y,
+          radius: radius,
+          progress: progress
+        });
+      });
+    }
+
+    function colorFor(progress) {
+      var hue = 170 - progress * 50;
+      var light = 40 + progress * 22;
+      return "hsl(" + hue.toFixed(1) + ", 45%, " + light.toFixed(1) + "%)";
+    }
+
+    function draw() {
+      if (!nodes.length) return;
+      var width = canvas.clientWidth || 600;
+      var height = canvas.clientHeight || 420;
+      ctx.clearRect(0, 0, width, height);
+
+      ctx.save();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(40, 32, 20, 0.2)";
+      ctx.beginPath();
+      nodes.forEach(function (node, index) {
+        if (index === 0) {
+          ctx.moveTo(node.x, node.y);
+        } else {
+          ctx.lineTo(node.x, node.y);
+        }
+      });
+      ctx.stroke();
+      ctx.restore();
+
+      nodes.forEach(function (node, index) {
+        ctx.beginPath();
+        ctx.fillStyle = colorFor(node.progress);
+        ctx.globalAlpha = 0.92;
+        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.globalAlpha = 0.25;
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "#2c2418";
+        ctx.stroke();
+
+        if (labelToggle && labelToggle.checked) {
+          var label = node.entry.title || "Untitled";
+          if (sorted.length > 10 && index < sorted.length - 5) {
+            return;
+          }
+          ctx.globalAlpha = 0.85;
+          ctx.fillStyle = "#2c2418";
+          ctx.font = "12px Georgia, serif";
+          ctx.fillText(label, node.x + node.radius + 6, node.y - node.radius - 4);
+        }
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    function refresh() {
+      buildNodes();
+      draw();
+    }
+
+    function handlePointer(event) {
+      if (!tooltip) return;
+      var rect = canvas.getBoundingClientRect();
+      var x = event.clientX - rect.left;
+      var y = event.clientY - rect.top;
+      var nearest = null;
+      var best = Infinity;
+
+      nodes.forEach(function (node) {
+        var dx = node.x - x;
+        var dy = node.y - y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < node.radius + 8 && dist < best) {
+          best = dist;
+          nearest = node;
+        }
+      });
+
+      if (nearest) {
+        tooltip.textContent =
+          (nearest.entry.title || "Untitled") +
+          " · " +
+          (nearest.entry.date || "Unknown date");
+        tooltip.style.left = clamp(x + 14, 12, rect.width - 220) + "px";
+        tooltip.style.top = clamp(y - 12, 12, rect.height - 60) + "px";
+        tooltip.classList.add("visible");
+      } else {
+        tooltip.classList.remove("visible");
+      }
+    }
+
+    function handleLeave() {
+      if (tooltip) tooltip.classList.remove("visible");
+    }
+
+    refresh();
+
+    if (stage) {
+      window.addEventListener("resize", refresh);
+    }
+
+    if (labelToggle) {
+      labelToggle.addEventListener("change", draw);
+    }
+
+    if (spacingInput) {
+      spacingInput.addEventListener("input", refresh);
+    }
+
+    canvas.addEventListener("mousemove", handlePointer);
+    canvas.addEventListener("mouseleave", handleLeave);
+  }
+
   fetch("log.json")
     .then(function (r) {
       if (!r.ok) throw new Error("log fetch failed");
@@ -452,6 +673,7 @@
       renderDrift(entries);
       renderForecast(entries);
       renderPulse(entries);
+      renderConstellation(entries);
       renderHistory(entries);
     })
     .catch(function () {
@@ -461,6 +683,7 @@
       renderDrift([]);
       renderForecast([]);
       renderPulse([]);
+      renderConstellation([]);
       var root = byId("history-list");
       if (root) {
         root.innerHTML = '<p class="muted">History unavailable.</p>';
