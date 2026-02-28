@@ -10,12 +10,12 @@
   <main class="container">
     <h1>Constellation</h1>
     <p class="subtitle">A spatial memory of every evolution.</p>
-    <p><a href="index.html">Back</a> · <a href="history.html">Open history</a></p>
+    <p><a href="index.html">Back</a> · <a href="history.html">Open history</a> · <a href="forge.html">Open mutation forge</a></p>
 
     <section class="panel constellation" aria-live="polite">
       <div class="constellation-header">
         <h2>Evolution constellation</h2>
-        <p class="muted">Node size tracks files changed. Color fades with age.</p>
+        <p class="muted">Node size tracks files changed. Color tracks system axis.</p>
       </div>
       <div class="constellation-stage">
         <canvas id="constellation-canvas" aria-label="Evolution constellation"></canvas>
@@ -37,6 +37,6 @@
       </div>
     </section>
   </main>
-  <script src="site.js"></script>
+  <script type="module" src="site.js"></script>
 </body>
 </html>

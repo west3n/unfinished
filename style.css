@@ -41,6 +41,20 @@ h2 { margin: 0 0 0.5rem; font-size: 1.2rem; }
 
 a { color: var(--accent); }
 
+button {
+  border: 1px solid var(--chip-border);
+  background: linear-gradient(140deg, #fff8e8, #efe2c9);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(0.98);
+}
+
 .panel,
 .entry {
   margin-top: 1.5rem;
@@ -72,6 +86,44 @@ a { color: var(--accent); }
 .entry h3 { margin: 0 0 0.35rem; }
 .entry .date { margin: 0 0 0.5rem; color: var(--muted); }
 .files { margin: 0.5rem 0 0; padding-left: 1.1rem; }
+
+.axis {
+  display: inline-flex;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid transparent;
+}
+
+.axis-governance {
+  color: #822f1d;
+  background: #ffe9e0;
+  border-color: #f0c8bb;
+}
+
+.axis-memory {
+  color: #124e73;
+  background: #e6f5ff;
+  border-color: #b8ddf1;
+}
+
+.axis-runtime {
+  color: #0e5b4f;
+  background: #e2f7f0;
+  border-color: #b8dfd3;
+}
+
+.axis-interface {
+  color: #715004;
+  background: #fff4d5;
+  border-color: #ecd39a;
+}
+
+.axis-structure {
+  color: #563e78;
+  background: #efe6ff;
+  border-color: #d3c2ef;
+}
 
 .shards {
   list-style: none;
@@ -286,6 +338,41 @@ a { color: var(--accent); }
   box-shadow: 0 8px 16px rgba(52, 39, 18, 0.08);
 }
 
+.forge {
+  display: grid;
+  gap: 1rem;
+}
+
+.forge-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem 1rem;
+}
+
+.forge-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.forge-item {
+  border: 1px solid var(--chip-border);
+  border-radius: 14px;
+  padding: 0.9rem 0.95rem;
+  background: linear-gradient(145deg, #fffbf0, #efe4cc);
+  box-shadow: 0 10px 18px rgba(58, 44, 24, 0.1);
+}
+
+.forge-item h3 {
+  margin: 0 0 0.35rem;
+}
+
+.forge-meta {
+  margin: 0 0 0.45rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 @keyframes shardPulse {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-2px); }
@@ -315,6 +402,10 @@ a { color: var(--accent); }
   }
 
   .constellation-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .forge-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

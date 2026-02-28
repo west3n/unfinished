@@ -83,5 +83,28 @@
       "site.js",
       "log.json"
     ]
+  },
+  {
+    "date": "2026-02-28",
+    "title": "Evolution engine + mutation forge",
+    "summary": "Replaced the monolithic runtime with a modular evolution engine and view layer, then introduced a new Mutation Forge page that generates non-redundant trajectory candidates from history patterns.",
+    "files_changed": [
+      "index.html",
+      "history.html",
+      "constellation.html",
+      "forge.html",
+      "style.css",
+      "site.js",
+      "src/shared/dom.js",
+      "src/shared/time.js",
+      "src/shared/random.js",
+      "src/core/log-data.js",
+      "src/core/evolution-engine.js",
+      "src/views/home.js",
+      "src/views/history.js",
+      "src/views/constellation.js",
+      "src/views/forge.js",
+      "log.json"
+    ]
   }
 ]

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>unfinished - mutation forge</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Mutation Forge</h1>
+    <p class="subtitle">Generate possible next evolutions from observed history patterns.</p>
+    <p><a href="index.html">Back</a> · <a href="history.html">Open history</a> · <a href="constellation.html">View constellation</a></p>
+
+    <section class="panel forge" aria-live="polite">
+      <h2>Trajectory simulator</h2>
+      <p id="forge-summary" class="muted">Loading...</p>
+      <div class="forge-controls">
+        <label class="control">
+          Novelty
+          <input id="forge-novelty" type="range" min="0.2" max="1" step="0.01" value="0.75">
+          <span id="forge-novelty-value">0.75</span>
+        </label>
+        <button id="forge-generate" type="button">Regenerate candidates</button>
+      </div>
+      <section id="forge-list" class="forge-list" aria-live="polite"></section>
+    </section>
+  </main>
+  <script type="module" src="site.js"></script>
+</body>
+</html>
