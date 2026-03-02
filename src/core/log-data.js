@@ -1,4 +1,5 @@
 import { dayDelta, toDayString } from "../shared/time.js";
+import { normalizeLedger } from "./memory-ledger.js";
 
 export function sortByDateAsc(entries) {
   return entries.slice().sort(function (a, b) {
@@ -75,11 +76,16 @@ export function detectRepetition(entries) {
   };
 }
 
-export async function loadLog(path) {
+export async function loadLedger(path) {
   var response = await fetch(path || "log.json");
   if (!response.ok) throw new Error("log fetch failed");
-  var entries = await response.json();
-  return Array.isArray(entries) ? entries : [];
+  var raw = await response.json();
+  return normalizeLedger(raw);
+}
+
+export async function loadLog(path) {
+  var ledger = await loadLedger(path);
+  return ledger.entries;
 }
 
 export function summarizeCadence(days) {

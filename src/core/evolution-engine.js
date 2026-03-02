@@ -1,15 +1,6 @@
 import { computeStreaks, detectRepetition, sortByDateAsc, sortByDateDesc, summarizeCadence, uniqueDays } from "./log-data.js";
 import { hashSeed, seededRandom } from "../shared/random.js";
-
-function classifyAxis(entry) {
-  var files = Array.isArray(entry.files_changed) ? entry.files_changed : [];
-  var joined = files.join("|").toLowerCase();
-  if (joined.includes(".github/workflows") || joined.includes("autonomy") || joined.includes("constitution")) return "governance";
-  if (joined.includes("log.json") && files.length <= 2) return "memory";
-  if (joined.includes("site.js") || joined.includes("src/")) return "runtime";
-  if (joined.includes("style.css") || joined.includes(".html")) return "interface";
-  return "structure";
-}
+import { inferAxis } from "./memory-ledger.js";
 
 function collectFileFrequency(entries) {
   return entries.reduce(function (acc, entry) {
@@ -38,6 +29,32 @@ function axisBalance(timeline) {
   return axes.map(function (axis) {
     return { axis: axis, count: counts[axis] || 0 };
   });
+}
+
+function summarizeEvents(events) {
+  var sorted = events.slice().sort(function (a, b) {
+    return String(a.date || "").localeCompare(String(b.date || ""));
+  });
+
+  var byType = sorted.reduce(function (acc, event) {
+    var type = event.type || "event.unknown";
+    acc[type] = (acc[type] || 0) + 1;
+    return acc;
+  }, {});
+
+  var byAxis = sorted.reduce(function (acc, event) {
+    var axis = event.axis || "structure";
+    acc[axis] = (acc[axis] || 0) + 1;
+    return acc;
+  }, {});
+
+  return {
+    count: sorted.length,
+    latestDate: sorted.length ? sorted[sorted.length - 1].date : "unknown",
+    recent: sorted.slice(-8).reverse(),
+    byType: byType,
+    byAxis: byAxis
+  };
 }
 
 function generateMutationCandidates(model, options) {
@@ -112,7 +129,14 @@ function generateMutationCandidates(model, options) {
   return candidates;
 }
 
-export function buildEvolutionModel(entries) {
+export function buildEvolutionModel(ledgerOrEntries) {
+  var ledger = Array.isArray(ledgerOrEntries)
+    ? { schema: "legacy-log@1", semantics: "entries-only", entries: ledgerOrEntries, events: [] }
+    : (ledgerOrEntries && typeof ledgerOrEntries === "object" ? ledgerOrEntries : { schema: "unknown", semantics: "unknown", entries: [], events: [] });
+
+  var entries = Array.isArray(ledger.entries) ? ledger.entries : [];
+  var events = Array.isArray(ledger.events) ? ledger.events : [];
+
   var asc = sortByDateAsc(entries);
   var desc = sortByDateDesc(entries);
   var days = uniqueDays(entries);
@@ -130,13 +154,18 @@ export function buildEvolutionModel(entries) {
       title: entry.title || "Untitled",
       summary: entry.summary || "",
       filesChanged: filesCount,
-      axis: classifyAxis(entry),
+      axis: inferAxis(entry),
       raw: entry
     };
   });
 
   return {
+    ledger: ledger,
+    ledgerSchema: ledger.schema || "unknown",
+    ledgerSemantics: ledger.semantics || "unknown",
     entries: entries,
+    events: events,
+    eventSummary: summarizeEvents(events),
     ascEntries: asc,
     descEntries: desc,
     timeline: timeline,

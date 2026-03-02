@@ -1,4 +1,4 @@
-import { byId, create } from "../shared/dom.js";
+import { byId, create, safeText } from "../shared/dom.js";
 
 function axisLabel(axis) {
   if (axis === "governance") return "Governance";
@@ -8,9 +8,26 @@ function axisLabel(axis) {
   return "Structure";
 }
 
+function renderLedgerRecap(model) {
+  var summary = byId("history-ledger-summary");
+  var events = byId("history-events");
+  if (!summary || !events) return;
+
+  safeText(summary, "Schema " + model.ledgerSchema + " using " + model.ledgerSemantics + " semantics. " + model.eventSummary.count + " events tracked.");
+
+  events.innerHTML = "";
+  model.eventSummary.recent.slice(0, 4).forEach(function (event) {
+    var item = create("li", "");
+    item.textContent = event.date + " · " + event.type + " · " + event.axis;
+    events.appendChild(item);
+  });
+}
+
 export function renderHistory(model) {
   var root = byId("history-list");
   if (!root) return;
+
+  renderLedgerRecap(model);
 
   root.innerHTML = "";
   if (!model.descEntries.length) {

@@ -198,6 +198,11 @@ function renderIntent(model) {
   var intent = byId("intent-summary");
   if (!intent) return;
 
+  if (model.ledgerSemantics === "dual-ledger") {
+    safeText(intent, "Evolution intent: maintain dual-ledger memory (entries + events) while distributing changes across underused axes.");
+    return;
+  }
+
   if (model.repetition.risk === "high") {
     safeText(intent, "Evolution intent: break repetition by shifting from panel increments into structural/runtime mutations.");
     return;
