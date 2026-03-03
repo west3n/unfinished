@@ -5,8 +5,7 @@ on:
     - cron: "17 5 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: write
+permissions: write-all
 
 concurrency:
   group: daily-codex-autonomy
@@ -17,12 +16,28 @@ jobs:
     runs-on: ubuntu-latest
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      AUTONOMY_GH_TOKEN: ${{ secrets.AUTONOMY_GH_TOKEN }}
     steps:
+      - name: Validate required secrets
+        run: |
+          set -euo pipefail
+
+          if [ -z "${OPENAI_API_KEY}" ]; then
+            echo "Missing OPENAI_API_KEY secret."
+            exit 1
+          fi
+
+          if [ -z "${AUTONOMY_GH_TOKEN}" ]; then
+            echo "Missing AUTONOMY_GH_TOKEN secret."
+            echo "Use a PAT or App token that can push workflow changes (workflow/workflows + contents write)."
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.AUTONOMY_GH_TOKEN || github.token }}
+          token: ${{ secrets.AUTONOMY_GH_TOKEN }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
