@@ -198,6 +198,11 @@ function renderIntent(model) {
   var intent = byId("intent-summary");
   if (!intent) return;
 
+  if (model.policy) {
+    safeText(intent, "Evolution intent: " + model.policy.intent + " Required axis: " + model.policy.requiredAxis + ".");
+    return;
+  }
+
   if (model.ledgerSemantics === "dual-ledger") {
     safeText(intent, "Evolution intent: maintain dual-ledger memory (entries + events) while distributing changes across underused axes.");
     return;

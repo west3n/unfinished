@@ -1,6 +1,7 @@
 import { computeStreaks, detectRepetition, sortByDateAsc, sortByDateDesc, summarizeCadence, uniqueDays } from "./log-data.js";
 import { hashSeed, seededRandom } from "../shared/random.js";
 import { inferAxis } from "./memory-ledger.js";
+import { evaluatePolicy } from "./policy-engine.js";
 
 function collectFileFrequency(entries) {
   return entries.reduce(function (acc, entry) {
@@ -65,6 +66,8 @@ function generateMutationCandidates(model, options) {
   var underusedAxis = model.axisBalance
     .slice()
     .sort(function (a, b) { return a.count - b.count; })[0].axis;
+  var policyAxis = model.policy && model.policy.requiredAxis ? model.policy.requiredAxis : null;
+  var targetAxis = policyAxis || underusedAxis;
 
   var weakFiles = Object.keys(model.fileFrequency)
     .sort(function (a, b) {
@@ -106,7 +109,7 @@ function generateMutationCandidates(model, options) {
   ];
 
   var weighted = templates.filter(function (item) {
-    return novelty > 0.45 || item.axis === underusedAxis;
+    return novelty > 0.45 || item.axis === targetAxis;
   });
 
   var candidates = [];
@@ -129,7 +132,7 @@ function generateMutationCandidates(model, options) {
   return candidates;
 }
 
-export function buildEvolutionModel(ledgerOrEntries) {
+export function buildEvolutionModel(ledgerOrEntries, options) {
   var ledger = Array.isArray(ledgerOrEntries)
     ? { schema: "legacy-log@1", semantics: "entries-only", entries: ledgerOrEntries, events: [] }
     : (ledgerOrEntries && typeof ledgerOrEntries === "object" ? ledgerOrEntries : { schema: "unknown", semantics: "unknown", entries: [], events: [] });
@@ -159,7 +162,7 @@ export function buildEvolutionModel(ledgerOrEntries) {
     };
   });
 
-  return {
+  var baseModel = {
     ledger: ledger,
     ledgerSchema: ledger.schema || "unknown",
     ledgerSemantics: ledger.semantics || "unknown",
@@ -179,6 +182,10 @@ export function buildEvolutionModel(ledgerOrEntries) {
     latestDate: days.length ? days[days.length - 1] : "unknown",
     originDate: days.length ? days[0] : "unknown"
   };
+
+  var policy = options && options.policy ? options.policy : null;
+  baseModel.policy = policy ? evaluatePolicy(baseModel, policy) : null;
+  return baseModel;
 }
 
 export function generateMutations(model, options) {

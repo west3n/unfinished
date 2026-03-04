@@ -1,10 +1,12 @@
 import { loadLedger } from "./src/core/log-data.js";
+import { defaultPolicy, loadPolicy } from "./src/core/policy-data.js";
 import { buildEvolutionModel } from "./src/core/evolution-engine.js";
 import { renderHome } from "./src/views/home.js";
 import { renderHistory } from "./src/views/history.js";
 import { renderConstellation } from "./src/views/constellation.js";
 import { renderForge } from "./src/views/forge.js";
 import { renderLedger } from "./src/views/ledger.js";
+import { renderGovernance } from "./src/views/governance.js";
 import { byId } from "./src/shared/dom.js";
 
 function renderFailure() {
@@ -25,17 +27,26 @@ function renderFailure() {
 
   var ledger = byId("ledger-summary");
   if (ledger) ledger.textContent = "Ledger unavailable.";
+
+  var governance = byId("governance-summary");
+  if (governance) governance.textContent = "Governance status unavailable.";
 }
 
-function boot(ledger) {
-  var model = buildEvolutionModel(ledger);
+function boot(ledger, policy) {
+  var model = buildEvolutionModel(ledger, { policy: policy });
   renderHome(model);
   renderHistory(model);
   renderConstellation(model);
   renderForge(model);
   renderLedger(model);
+  renderGovernance(model);
 }
 
-loadLedger("log.json")
-  .then(boot)
+Promise.all([
+  loadLedger("log.json"),
+  loadPolicy("autonomy.policy.json").catch(defaultPolicy)
+])
+  .then(function (results) {
+    boot(results[0], results[1]);
+  })
   .catch(renderFailure);

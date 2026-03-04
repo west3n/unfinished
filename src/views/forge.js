@@ -37,7 +37,11 @@ export function renderForge(model) {
   if (!summary || !noveltyInput || !noveltyValue || !generateButton) return;
 
   var risk = model.repetition.risk;
-  safeText(summary, "Repetition risk: " + risk + ". " + model.repetition.details);
+  if (model.policy) {
+    safeText(summary, "Policy status: " + model.policy.status + " (" + model.policy.score + "/100). Target axis: " + model.policy.requiredAxis + ". " + model.repetition.details);
+  } else {
+    safeText(summary, "Repetition risk: " + risk + ". " + model.repetition.details);
+  }
 
   function refresh() {
     var novelty = Number(noveltyInput.value);

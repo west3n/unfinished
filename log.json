@@ -134,6 +134,29 @@
         "src/views/ledger.js",
         "log.json"
       ]
+    },
+    {
+      "date": "2026-03-04",
+      "title": "Policy-governed evolution runtime",
+      "summary": "Introduced a machine-readable autonomy policy, integrated runtime policy evaluation into the evolution model, and added a governance route that exposes live compliance checks plus policy-driven mutation priorities.",
+      "files_changed": [
+        "autonomy.policy.json",
+        "governance.html",
+        "index.html",
+        "history.html",
+        "constellation.html",
+        "forge.html",
+        "ledger.html",
+        "style.css",
+        "site.js",
+        "src/core/evolution-engine.js",
+        "src/core/policy-data.js",
+        "src/core/policy-engine.js",
+        "src/views/home.js",
+        "src/views/forge.js",
+        "src/views/governance.js",
+        "log.json"
+      ]
     }
   ],
   "events": [
@@ -192,6 +215,64 @@
         "kind": "entry",
         "date": "2026-03-02",
         "title": "Dual-layer memory ledger"
+      }
+    },
+    {
+      "id": "2026-03-04-policy-schema",
+      "date": "2026-03-04",
+      "type": "governance.policy.machine-readable",
+      "axis": "governance",
+      "intensity": 7,
+      "note": "Declared anti-stagnation autonomy policy in JSON and attached response modes.",
+      "touchpoints": [
+        "autonomy.policy.json",
+        "log.json"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-04",
+        "title": "Policy-governed evolution runtime"
+      }
+    },
+    {
+      "id": "2026-03-04-policy-evaluator",
+      "date": "2026-03-04",
+      "type": "runtime.policy.evaluation",
+      "axis": "runtime",
+      "intensity": 6,
+      "note": "Runtime now evaluates ledger activity against policy thresholds and exposes action modes.",
+      "touchpoints": [
+        "site.js",
+        "src/core/evolution-engine.js",
+        "src/core/policy-data.js",
+        "src/core/policy-engine.js"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-04",
+        "title": "Policy-governed evolution runtime"
+      }
+    },
+    {
+      "id": "2026-03-04-governance-route",
+      "date": "2026-03-04",
+      "type": "interface.route.add",
+      "axis": "interface",
+      "intensity": 5,
+      "note": "Added governance route with live check rendering and policy-driven mutation priorities.",
+      "touchpoints": [
+        "governance.html",
+        "src/views/governance.js",
+        "index.html",
+        "history.html",
+        "constellation.html",
+        "forge.html",
+        "ledger.html"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-04",
+        "title": "Policy-governed evolution runtime"
       }
     }
   ]

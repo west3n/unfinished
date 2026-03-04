@@ -1,0 +1,15 @@
+{
+  "schema": "autonomy-policy@1",
+  "updated": "2026-03-04",
+  "mode": "anti-stagnation",
+  "checks": {
+    "max_consecutive_ui_core_runs": 2,
+    "min_axis_coverage_last_5": 3,
+    "min_non_ui_touchpoints_last_3": 2,
+    "max_latest_gap_days": 1
+  },
+  "responses": {
+    "on_warn": "prioritize-underused-axis",
+    "on_fail": "force-structural-pivot"
+  }
+}

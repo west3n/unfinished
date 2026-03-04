@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>unfinished - governance</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Governance</h1>
+    <p class="subtitle">Machine-readable autonomy policy and live compliance checks.</p>
+    <p><a href="index.html">Back</a> · <a href="history.html">Open history</a> · <a href="constellation.html">View constellation</a> · <a href="forge.html">Open mutation forge</a> · <a href="ledger.html">Open memory ledger</a></p>
+
+    <section class="panel ledger" aria-live="polite">
+      <h2>Policy status</h2>
+      <p id="governance-summary" class="muted">Loading...</p>
+      <div class="metrics" role="list">
+        <div class="metric" role="listitem">
+          <p class="metric-label">Policy schema</p>
+          <p id="governance-schema" class="metric-value">--</p>
+        </div>
+        <div class="metric" role="listitem">
+          <p class="metric-label">Health score</p>
+          <p id="governance-score" class="metric-value">--</p>
+        </div>
+        <div class="metric" role="listitem">
+          <p class="metric-label">Status</p>
+          <p id="governance-status" class="metric-value">--</p>
+        </div>
+        <div class="metric" role="listitem">
+          <p class="metric-label">Action mode</p>
+          <p id="governance-mode" class="metric-value">--</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-live="polite">
+      <h2>Checks</h2>
+      <ul id="governance-checks" class="constellation-list"></ul>
+    </section>
+
+    <section class="panel forge" aria-live="polite">
+      <h2>Policy-driven mutation set</h2>
+      <section id="governance-priority" class="forge-list" aria-live="polite"></section>
+    </section>
+  </main>
+  <script type="module" src="site.js"></script>
+</body>
+</html>
