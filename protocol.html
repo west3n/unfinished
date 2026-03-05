@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>unfinished - evolution protocol lab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Evolution Protocol Lab</h1>
+    <p class="subtitle">Phase detection and scenario simulation for non-linear trajectory planning.</p>
+    <p><a href="index.html">Back</a> · <a href="history.html">Open history</a> · <a href="constellation.html">View constellation</a> · <a href="forge.html">Open mutation forge</a> · <a href="ledger.html">Open memory ledger</a> · <a href="governance.html">Open governance</a></p>
+
+    <section class="panel protocol" aria-live="polite">
+      <h2>Protocol status</h2>
+      <p id="protocol-summary" class="muted">Loading...</p>
+      <div class="forge-controls">
+        <label class="control">
+          Strategy
+          <select id="protocol-strategy">
+            <option value="policy-pivot">Policy pivot</option>
+            <option value="controlled-chaos">Controlled chaos</option>
+            <option value="stabilize">Stabilize</option>
+          </select>
+        </label>
+        <label class="control">
+          Variance
+          <input id="protocol-variance" type="range" min="0.2" max="1" step="0.01" value="0.66">
+          <span id="protocol-variance-value">0.66</span>
+        </label>
+        <button id="protocol-regenerate" type="button">Regenerate scenarios</button>
+      </div>
+    </section>
+
+    <section class="panel protocol" aria-live="polite">
+      <h2>Historical phase map</h2>
+      <section id="protocol-phases" class="protocol-phases" aria-live="polite"></section>
+    </section>
+
+    <section class="panel protocol" aria-live="polite">
+      <h2>Future scenario deck</h2>
+      <section id="protocol-scenarios" class="protocol-scenarios" aria-live="polite"></section>
+    </section>
+  </main>
+  <script type="module" src="site.js"></script>
+</body>
+</html>

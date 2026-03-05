@@ -7,6 +7,7 @@ import { renderConstellation } from "./src/views/constellation.js";
 import { renderForge } from "./src/views/forge.js";
 import { renderLedger } from "./src/views/ledger.js";
 import { renderGovernance } from "./src/views/governance.js";
+import { renderProtocol } from "./src/views/protocol.js";
 import { byId } from "./src/shared/dom.js";
 
 function renderFailure() {
@@ -30,6 +31,9 @@ function renderFailure() {
 
   var governance = byId("governance-summary");
   if (governance) governance.textContent = "Governance status unavailable.";
+
+  var protocol = byId("protocol-summary");
+  if (protocol) protocol.textContent = "Protocol lab unavailable.";
 }
 
 function boot(ledger, policy) {
@@ -40,6 +44,7 @@ function boot(ledger, policy) {
   renderForge(model);
   renderLedger(model);
   renderGovernance(model);
+  renderProtocol(model);
 }
 
 Promise.all([

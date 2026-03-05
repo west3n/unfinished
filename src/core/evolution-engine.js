@@ -2,6 +2,7 @@ import { computeStreaks, detectRepetition, sortByDateAsc, sortByDateDesc, summar
 import { hashSeed, seededRandom } from "../shared/random.js";
 import { inferAxis } from "./memory-ledger.js";
 import { evaluatePolicy } from "./policy-engine.js";
+import { derivePhases, generateScenarios } from "./trajectory-lab.js";
 
 function collectFileFrequency(entries) {
   return entries.reduce(function (acc, entry) {
@@ -183,6 +184,8 @@ export function buildEvolutionModel(ledgerOrEntries, options) {
     originDate: days.length ? days[0] : "unknown"
   };
 
+  baseModel.phases = derivePhases(baseModel.ascEntries);
+
   var policy = options && options.policy ? options.policy : null;
   baseModel.policy = policy ? evaluatePolicy(baseModel, policy) : null;
   return baseModel;
@@ -194,3 +197,5 @@ export function generateMutations(model, options) {
   }
   return generateMutationCandidates(model, options || {});
 }
+
+export { generateScenarios };

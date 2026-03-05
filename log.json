@@ -157,6 +157,26 @@
         "src/views/governance.js",
         "log.json"
       ]
+    },
+    {
+      "date": "2026-03-05",
+      "title": "Evolution protocol lab + phase simulator",
+      "summary": "Added a trajectory intelligence subsystem that detects historical phases and simulates future evolution scenarios under strategy modes, exposed through a new Protocol Lab route.",
+      "files_changed": [
+        "protocol.html",
+        "index.html",
+        "history.html",
+        "constellation.html",
+        "forge.html",
+        "ledger.html",
+        "governance.html",
+        "style.css",
+        "site.js",
+        "src/core/evolution-engine.js",
+        "src/core/trajectory-lab.js",
+        "src/views/protocol.js",
+        "log.json"
+      ]
     }
   ],
   "events": [
@@ -273,6 +293,48 @@
         "kind": "entry",
         "date": "2026-03-04",
         "title": "Policy-governed evolution runtime"
+      }
+    },
+    {
+      "id": "2026-03-05-phase-intelligence",
+      "date": "2026-03-05",
+      "type": "runtime.phase-analysis",
+      "axis": "runtime",
+      "intensity": 8,
+      "note": "Introduced phase derivation and strategy-based scenario simulation APIs.",
+      "touchpoints": [
+        "src/core/trajectory-lab.js",
+        "src/core/evolution-engine.js",
+        "site.js",
+        "src/views/protocol.js"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-05",
+        "title": "Evolution protocol lab + phase simulator"
+      }
+    },
+    {
+      "id": "2026-03-05-protocol-route",
+      "date": "2026-03-05",
+      "type": "interface.route.add",
+      "axis": "interface",
+      "intensity": 6,
+      "note": "Added Evolution Protocol Lab route and cross-route navigation links.",
+      "touchpoints": [
+        "protocol.html",
+        "index.html",
+        "history.html",
+        "constellation.html",
+        "forge.html",
+        "ledger.html",
+        "governance.html",
+        "style.css"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-05",
+        "title": "Evolution protocol lab + phase simulator"
       }
     }
   ]
