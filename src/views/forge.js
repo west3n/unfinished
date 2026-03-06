@@ -37,10 +37,13 @@ export function renderForge(model) {
   if (!summary || !noveltyInput || !noveltyValue || !generateButton) return;
 
   var risk = model.repetition.risk;
+  var intentLine = model.intent
+    ? " Intent debt: " + model.intent.noveltyDebt + ". Primary axis: " + model.intent.primaryAxis + "."
+    : "";
   if (model.policy) {
-    safeText(summary, "Policy status: " + model.policy.status + " (" + model.policy.score + "/100). Target axis: " + model.policy.requiredAxis + ". " + model.repetition.details);
+    safeText(summary, "Policy status: " + model.policy.status + " (" + model.policy.score + "/100). Target axis: " + model.policy.requiredAxis + ". " + model.repetition.details + intentLine);
   } else {
-    safeText(summary, "Repetition risk: " + risk + ". " + model.repetition.details);
+    safeText(summary, "Repetition risk: " + risk + ". " + model.repetition.details + intentLine);
   }
 
   function refresh() {

@@ -198,6 +198,16 @@ function renderIntent(model) {
   var intent = byId("intent-summary");
   if (!intent) return;
 
+  if (model.intent && Array.isArray(model.intent.tracks) && model.intent.tracks.length) {
+    var lead = model.intent.tracks[0];
+    safeText(
+      intent,
+      "Evolution intent: " + lead.label + " (" + lead.axis + ", urgency " + lead.urgency + "). " +
+      "Alignment " + model.intent.alignmentScore + "/100, novelty debt " + model.intent.noveltyDebt + "."
+    );
+    return;
+  }
+
   if (model.policy) {
     safeText(intent, "Evolution intent: " + model.policy.intent + " Required axis: " + model.policy.requiredAxis + ".");
     return;

@@ -1,12 +1,13 @@
 var fallbackPolicy = {
-  schema: "autonomy-policy@1",
+  schema: "autonomy-policy@2",
   updated: "1970-01-01",
   mode: "fallback",
   checks: {
     max_consecutive_ui_core_runs: 2,
     min_axis_coverage_last_5: 3,
     min_non_ui_touchpoints_last_3: 2,
-    max_latest_gap_days: 1
+    max_latest_gap_days: 1,
+    min_intent_alignment_score: 55
   },
   responses: {
     on_warn: "prioritize-underused-axis",
@@ -32,7 +33,8 @@ export function normalizePolicy(raw) {
       max_consecutive_ui_core_runs: normalizeNumber(checks.max_consecutive_ui_core_runs, fallbackPolicy.checks.max_consecutive_ui_core_runs),
       min_axis_coverage_last_5: normalizeNumber(checks.min_axis_coverage_last_5, fallbackPolicy.checks.min_axis_coverage_last_5),
       min_non_ui_touchpoints_last_3: normalizeNumber(checks.min_non_ui_touchpoints_last_3, fallbackPolicy.checks.min_non_ui_touchpoints_last_3),
-      max_latest_gap_days: normalizeNumber(checks.max_latest_gap_days, fallbackPolicy.checks.max_latest_gap_days)
+      max_latest_gap_days: normalizeNumber(checks.max_latest_gap_days, fallbackPolicy.checks.max_latest_gap_days),
+      min_intent_alignment_score: normalizeNumber(checks.min_intent_alignment_score, fallbackPolicy.checks.min_intent_alignment_score)
     },
     responses: {
       on_warn: String(responses.on_warn || fallbackPolicy.responses.on_warn),

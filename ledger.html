@@ -9,7 +9,7 @@
 <body>
   <main class="container">
     <h1>Memory Ledger</h1>
-    <p class="subtitle">A schema-aware event stream layered on top of daily run entries.</p>
+    <p class="subtitle">A schema-aware tri-ledger combining entries, events, and intent tracks.</p>
     <p><a href="index.html">Back</a> · <a href="history.html">Open history</a> · <a href="constellation.html">View constellation</a> · <a href="forge.html">Open mutation forge</a> · <a href="governance.html">Open governance</a> · <a href="protocol.html">Open protocol lab</a></p>
 
     <section class="panel ledger" aria-live="polite">
@@ -28,6 +28,10 @@
           <p class="metric-label">Event types</p>
           <p id="ledger-types" class="metric-value">--</p>
         </div>
+        <div class="metric" role="listitem">
+          <p class="metric-label">Intents</p>
+          <p id="ledger-intent-count" class="metric-value">--</p>
+        </div>
       </div>
       <div class="forge-controls">
         <label class="control">
@@ -43,6 +47,7 @@
         </label>
       </div>
       <section id="ledger-events" class="ledger-events" aria-live="polite"></section>
+      <section id="ledger-intents" class="ledger-events" aria-live="polite"></section>
     </section>
   </main>
   <script type="module" src="site.js"></script>

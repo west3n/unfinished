@@ -113,6 +113,14 @@ function axisPriority(model, targetAxis, variance) {
 
   byAxis[targetAxis] = byAxis[targetAxis] + 4;
 
+  if (model.intent && Array.isArray(model.intent.tracks)) {
+    model.intent.tracks.forEach(function (track) {
+      if (!track || !track.axis) return;
+      var weight = Math.max(1, Math.round(Number(track.urgency || 0) / 30));
+      byAxis[track.axis] = (byAxis[track.axis] || 1) + weight;
+    });
+  }
+
   if (variance > 0.65) {
     AXES.forEach(function (axis) {
       byAxis[axis] = byAxis[axis] + 1;
@@ -208,7 +216,7 @@ export function generateScenarios(model, options) {
       axisCoverage: Object.keys(coverage).length,
       risk: riskLabel(strategy, variance),
       confidence: clamp(Math.round((0.5 + random() * (1 - variance * 0.35)) * 100), 40, 94),
-      thesis: "Push the system through " + strategy + " mode while anchoring on " + targetAxis + ".",
+      thesis: "Push the system through " + strategy + " mode while anchoring on " + targetAxis + " and reducing intent debt.",
       steps: steps
     });
   }

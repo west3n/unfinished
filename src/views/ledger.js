@@ -31,19 +31,42 @@ function renderEventList(events) {
   });
 }
 
+function renderIntentList(intents) {
+  var list = byId("ledger-intents");
+  if (!list) return;
+  list.innerHTML = "";
+
+  if (!intents.length) {
+    list.appendChild(create("p", "muted", "No declared intents available."));
+    return;
+  }
+
+  intents.forEach(function (intent) {
+    var item = create("article", "ledger-event");
+    item.appendChild(create("h3", "", intent.label || "Unnamed intent"));
+    item.appendChild(create("p", "ledger-meta", intent.date + " · axis " + intent.axis + " · urgency " + intent.urgency));
+    if (intent.reason) {
+      item.appendChild(create("p", "", intent.reason));
+    }
+    list.appendChild(item);
+  });
+}
+
 export function renderLedger(model) {
   var summary = byId("ledger-summary");
   var schema = byId("ledger-schema");
   var semantics = byId("ledger-semantics");
   var typeCount = byId("ledger-types");
+  var intentCount = byId("ledger-intent-count");
   var axisFilter = byId("ledger-axis-filter");
 
-  if (!summary || !schema || !semantics || !typeCount) return;
+  if (!summary || !schema || !semantics || !typeCount || !intentCount) return;
 
-  safeText(summary, "Event ledger contains " + model.eventSummary.count + " event(s), latest at " + model.eventSummary.latestDate + ".");
+  safeText(summary, "Tri-ledger tracks " + model.eventSummary.count + " event(s) and " + model.intents.length + " intent(s). Latest event: " + model.eventSummary.latestDate + ".");
   safeText(schema, model.ledgerSchema);
   safeText(semantics, model.ledgerSemantics);
   safeText(typeCount, String(Object.keys(model.eventSummary.byType).length));
+  safeText(intentCount, String(model.intents.length));
 
   function refresh() {
     var axis = axisFilter ? axisFilter.value : "all";
@@ -51,6 +74,16 @@ export function renderLedger(model) {
       return axis === "all" || event.axis === axis;
     });
     renderEventList(events);
+
+    var intents = model.intents
+      .slice()
+      .sort(function (a, b) {
+        return Number(b.urgency || 0) - Number(a.urgency || 0);
+      })
+      .filter(function (intent) {
+        return axis === "all" || intent.axis === axis;
+      });
+    renderIntentList(intents);
   }
 
   if (axisFilter) {

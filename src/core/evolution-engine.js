@@ -3,6 +3,7 @@ import { hashSeed, seededRandom } from "../shared/random.js";
 import { inferAxis } from "./memory-ledger.js";
 import { evaluatePolicy } from "./policy-engine.js";
 import { derivePhases, generateScenarios } from "./trajectory-lab.js";
+import { deriveIntentSignals } from "./intent-engine.js";
 
 function collectFileFrequency(entries) {
   return entries.reduce(function (acc, entry) {
@@ -67,8 +68,9 @@ function generateMutationCandidates(model, options) {
   var underusedAxis = model.axisBalance
     .slice()
     .sort(function (a, b) { return a.count - b.count; })[0].axis;
+  var intentAxis = model.intent && model.intent.primaryAxis ? model.intent.primaryAxis : null;
   var policyAxis = model.policy && model.policy.requiredAxis ? model.policy.requiredAxis : null;
-  var targetAxis = policyAxis || underusedAxis;
+  var targetAxis = policyAxis || intentAxis || underusedAxis;
 
   var weakFiles = Object.keys(model.fileFrequency)
     .sort(function (a, b) {
@@ -136,10 +138,13 @@ function generateMutationCandidates(model, options) {
 export function buildEvolutionModel(ledgerOrEntries, options) {
   var ledger = Array.isArray(ledgerOrEntries)
     ? { schema: "legacy-log@1", semantics: "entries-only", entries: ledgerOrEntries, events: [] }
-    : (ledgerOrEntries && typeof ledgerOrEntries === "object" ? ledgerOrEntries : { schema: "unknown", semantics: "unknown", entries: [], events: [] });
+    : (ledgerOrEntries && typeof ledgerOrEntries === "object"
+      ? ledgerOrEntries
+      : { schema: "unknown", semantics: "unknown", entries: [], events: [], intents: [] });
 
   var entries = Array.isArray(ledger.entries) ? ledger.entries : [];
   var events = Array.isArray(ledger.events) ? ledger.events : [];
+  var intents = Array.isArray(ledger.intents) ? ledger.intents : [];
 
   var asc = sortByDateAsc(entries);
   var desc = sortByDateDesc(entries);
@@ -169,6 +174,7 @@ export function buildEvolutionModel(ledgerOrEntries, options) {
     ledgerSemantics: ledger.semantics || "unknown",
     entries: entries,
     events: events,
+    intents: intents,
     eventSummary: summarizeEvents(events),
     ascEntries: asc,
     descEntries: desc,
@@ -185,6 +191,7 @@ export function buildEvolutionModel(ledgerOrEntries, options) {
   };
 
   baseModel.phases = derivePhases(baseModel.ascEntries);
+  baseModel.intent = deriveIntentSignals(baseModel);
 
   var policy = options && options.policy ? options.policy : null;
   baseModel.policy = policy ? evaluatePolicy(baseModel, policy) : null;

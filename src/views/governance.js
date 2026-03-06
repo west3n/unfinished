@@ -62,7 +62,8 @@ export function renderGovernance(model) {
 
   safeText(summary, model.policy.intent);
   safeText(schema, model.policy.schema + " (" + model.policy.updated + ")");
-  safeText(score, String(model.policy.score));
+  var intentAlignment = model.intent ? model.intent.alignmentScore : null;
+  safeText(score, String(model.policy.score) + (intentAlignment !== null ? " · intent " + intentAlignment : ""));
   safeText(status, model.policy.status);
   safeText(mode, model.policy.actionMode);
 

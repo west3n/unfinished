@@ -80,6 +80,12 @@ export function evaluatePolicy(model, policy) {
   var recentCoverage = axisCoverage(descEntries, 5);
   var recentNonUiTouchpoints = nonUiTouchpoints(descEntries, 3);
   var latestGap = model && model.cadence ? model.cadence.latestGap : 0;
+  var intentAlignment = model && model.intent && typeof model.intent.alignmentScore === "number"
+    ? model.intent.alignmentScore
+    : 50;
+  var minIntentAlignment = typeof checks.min_intent_alignment_score === "number"
+    ? checks.min_intent_alignment_score
+    : 55;
 
   var results = [
     {
@@ -113,13 +119,21 @@ export function evaluatePolicy(model, policy) {
       threshold: checks.max_latest_gap_days,
       status: latestGap > checks.max_latest_gap_days ? "fail" : latestGap === checks.max_latest_gap_days ? "warn" : "pass",
       detail: "Days since latest entry: " + latestGap + " (max " + checks.max_latest_gap_days + ")."
+    },
+    {
+      id: "intent-alignment",
+      label: "Intent alignment score",
+      value: intentAlignment,
+      threshold: minIntentAlignment,
+      status: intentAlignment < minIntentAlignment ? "fail" : intentAlignment < (minIntentAlignment + 10) ? "warn" : "pass",
+      detail: "Derived intent alignment: " + intentAlignment + " (target " + minIntentAlignment + "+)."
     }
   ];
 
   var status = overallStatus(results);
   var score = results.reduce(function (sum, check) {
-    if (check.status === "pass") return sum + 25;
-    if (check.status === "warn") return sum + 15;
+    if (check.status === "pass") return sum + 20;
+    if (check.status === "warn") return sum + 12;
     return sum;
   }, 0);
 

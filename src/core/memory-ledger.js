@@ -5,6 +5,17 @@ function normalizeFiles(files) {
   });
 }
 
+function normalizeIntent(intent, index) {
+  return {
+    id: String(intent && intent.id ? intent.id : "intent-" + String(index + 1).padStart(3, "0")),
+    axis: String(intent && intent.axis ? intent.axis : "structure"),
+    label: String(intent && intent.label ? intent.label : "Unnamed intent"),
+    urgency: Math.max(1, Math.min(100, Math.round(Number(intent && intent.urgency ? intent.urgency : 50)))),
+    reason: String(intent && intent.reason ? intent.reason : ""),
+    date: String(intent && intent.date ? intent.date : "unknown").slice(0, 10)
+  };
+}
+
 export function inferAxis(entry) {
   if (entry && typeof entry.axis === "string" && entry.axis) return entry.axis;
 
@@ -79,6 +90,7 @@ export function normalizeLedger(raw) {
       semantics: "entries-only",
       entries: legacyEntries,
       events: deriveEvents(legacyEntries),
+      intents: [],
       metadata: {
         migrated: true,
         strategy: "derived-events"
@@ -98,12 +110,18 @@ export function normalizeLedger(raw) {
   var events = Array.isArray(data.events) && data.events.length
     ? data.events.map(normalizeEvent)
     : deriveEvents(entries);
+  var intents = Array.isArray(data.intents) && data.intents.length
+    ? data.intents.map(normalizeIntent)
+    : [];
+
+  var semantics = String(data.semantics || (intents.length ? "tri-ledger" : "dual-ledger"));
 
   return {
-    schema: String(data.schema || "memory-ledger@2"),
-    semantics: String(data.semantics || "dual-ledger"),
+    schema: String(data.schema || "memory-ledger@3"),
+    semantics: semantics,
     entries: entries,
     events: events,
+    intents: intents,
     metadata: data.metadata && typeof data.metadata === "object" ? data.metadata : {}
   };
 }

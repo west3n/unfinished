@@ -58,7 +58,10 @@ export function renderProtocol(model) {
   if (!summary || !strategy || !variance || !varianceValue || !regenerate) return;
 
   var phaseCount = Array.isArray(model.phases) ? model.phases.length : 0;
-  safeText(summary, "Detected " + phaseCount + " historical phase(s). Current policy mode: " + (model.policy ? model.policy.actionMode : "unconstrained") + ".");
+  var leadIntent = model.intent && Array.isArray(model.intent.tracks) && model.intent.tracks.length
+    ? model.intent.tracks[0].label + " (" + model.intent.tracks[0].axis + ")"
+    : "none";
+  safeText(summary, "Detected " + phaseCount + " historical phase(s). Current policy mode: " + (model.policy ? model.policy.actionMode : "unconstrained") + ". Lead intent: " + leadIntent + ".");
 
   renderPhases(model);
 

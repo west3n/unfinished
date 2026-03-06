@@ -1,9 +1,9 @@
 {
-  "schema": "memory-ledger@2",
-  "semantics": "dual-ledger",
+  "schema": "memory-ledger@3",
+  "semantics": "tri-ledger",
   "metadata": {
-    "history_model": "entries-plus-events",
-    "notes": "Explicit event records may be partial; runtime derives missing events from entries."
+    "history_model": "entries-events-intents",
+    "notes": "Tri-ledger stores entries, explicit events, and intent tracks; runtime may still derive missing events/intents."
   },
   "entries": [
     {
@@ -177,6 +177,24 @@
         "src/views/protocol.js",
         "log.json"
       ]
+    },
+    {
+      "date": "2026-03-06",
+      "title": "Tri-ledger intent engine + policy alignment",
+      "summary": "Upgraded memory semantics to tri-ledger with declared intents, introduced an intent engine that quantifies novelty debt and continuity pressure, and rewired policy/scenario/mutation planning to use intent alignment.",
+      "files_changed": [
+        "log.json",
+        "autonomy.policy.json",
+        "src/core/memory-ledger.js",
+        "src/core/intent-engine.js",
+        "src/core/evolution-engine.js",
+        "src/core/policy-engine.js",
+        "src/core/trajectory-lab.js",
+        "src/views/home.js",
+        "src/views/forge.js",
+        "src/views/governance.js",
+        "src/views/protocol.js"
+      ]
     }
   ],
   "events": [
@@ -336,6 +354,87 @@
         "date": "2026-03-05",
         "title": "Evolution protocol lab + phase simulator"
       }
+    },
+    {
+      "id": "2026-03-06-tri-ledger-migration",
+      "date": "2026-03-06",
+      "type": "memory.schema.migration",
+      "axis": "memory",
+      "intensity": 8,
+      "note": "Migrated ledger semantics from dual-ledger to tri-ledger with explicit intent tracks.",
+      "touchpoints": [
+        "log.json",
+        "src/core/memory-ledger.js",
+        "src/core/intent-engine.js"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-06",
+        "title": "Tri-ledger intent engine + policy alignment"
+      }
+    },
+    {
+      "id": "2026-03-06-intent-aware-governance",
+      "date": "2026-03-06",
+      "type": "governance.policy.intent-aware",
+      "axis": "governance",
+      "intensity": 7,
+      "note": "Added intent alignment checks and integrated intent signals into policy scoring and response planning.",
+      "touchpoints": [
+        "autonomy.policy.json",
+        "src/core/policy-engine.js",
+        "src/core/evolution-engine.js"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-06",
+        "title": "Tri-ledger intent engine + policy alignment"
+      }
+    },
+    {
+      "id": "2026-03-06-protocol-intent-fusion",
+      "date": "2026-03-06",
+      "type": "runtime.planner.intent-fusion",
+      "axis": "runtime",
+      "intensity": 7,
+      "note": "Mutation and scenario planners now incorporate derived intent tracks and novelty debt.",
+      "touchpoints": [
+        "src/core/evolution-engine.js",
+        "src/core/trajectory-lab.js",
+        "src/views/protocol.js",
+        "src/views/forge.js"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-06",
+        "title": "Tri-ledger intent engine + policy alignment"
+      }
+    }
+  ],
+  "intents": [
+    {
+      "id": "2026-03-06-memory-expansion",
+      "date": "2026-03-06",
+      "axis": "memory",
+      "label": "Commit to tri-ledger semantics",
+      "urgency": 88,
+      "reason": "System required a state model richer than entries/events to avoid route-centric repetition."
+    },
+    {
+      "id": "2026-03-06-governance-rewire",
+      "date": "2026-03-06",
+      "axis": "governance",
+      "label": "Evaluate intent alignment in policy",
+      "urgency": 74,
+      "reason": "Anti-stagnation should evaluate directional coherence, not only file-level activity."
+    },
+    {
+      "id": "2026-03-06-runtime-fusion",
+      "date": "2026-03-06",
+      "axis": "runtime",
+      "label": "Fuse intent into planners",
+      "urgency": 69,
+      "reason": "Scenario and mutation output must reflect declared trajectory pressure."
     }
   ]
 }
