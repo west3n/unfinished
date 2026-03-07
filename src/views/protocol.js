@@ -20,7 +20,7 @@ function renderPhases(model) {
   });
 }
 
-function renderScenarioCards(scenarios) {
+function renderScenarioCards(scenarios, program) {
   var root = byId("protocol-scenarios");
   if (!root) return;
 
@@ -36,10 +36,24 @@ function renderScenarioCards(scenarios) {
     card.appendChild(create("p", "protocol-meta", "Risk: " + scenario.risk + " · Confidence: " + scenario.confidence + "% · Axis coverage: " + scenario.axisCoverage));
     card.appendChild(create("p", "", scenario.thesis));
 
+    if (program) {
+      card.appendChild(create("p", "muted", "Execution program: " + program.name + " · " + program.strategy + " · confidence " + program.confidence + "."));
+    }
+
     var list = create("ol", "protocol-steps");
-    scenario.steps.forEach(function (step) {
+    scenario.steps.forEach(function (step, index) {
+      var merged = null;
+      if (program && Array.isArray(program.steps) && program.steps.length) {
+        merged = program.steps[index % program.steps.length];
+      }
+
       var item = create("li", "");
-      item.textContent = step.date + " · " + step.axis + " · D" + step.disruption + " · " + step.action;
+      if (merged) {
+        item.textContent = step.date + " · " + step.axis + " · D" + step.disruption + " · " + step.action +
+          " | Program: " + merged.action + " [" + merged.axis + "]";
+      } else {
+        item.textContent = step.date + " · " + step.axis + " · D" + step.disruption + " · " + step.action;
+      }
       list.appendChild(item);
     });
 
@@ -61,7 +75,13 @@ export function renderProtocol(model) {
   var leadIntent = model.intent && Array.isArray(model.intent.tracks) && model.intent.tracks.length
     ? model.intent.tracks[0].label + " (" + model.intent.tracks[0].axis + ")"
     : "none";
-  safeText(summary, "Detected " + phaseCount + " historical phase(s). Current policy mode: " + (model.policy ? model.policy.actionMode : "unconstrained") + ". Lead intent: " + leadIntent + ".");
+  var programCount = model.programSummary ? model.programSummary.count : 0;
+  safeText(
+    summary,
+    "Detected " + phaseCount + " historical phase(s). Current policy mode: " +
+    (model.policy ? model.policy.actionMode : "unconstrained") + ". Lead intent: " + leadIntent +
+    ". Program tracks: " + programCount + "."
+  );
 
   renderPhases(model);
 
@@ -74,7 +94,13 @@ export function renderProtocol(model) {
       variance: varianceLevel,
       count: 3
     });
-    renderScenarioCards(scenarios);
+    var program = model.programs && model.programs.find(function (item) {
+      return item.strategy === selected;
+    });
+    if (!program && model.programSummary) {
+      program = model.programSummary.primary;
+    }
+    renderScenarioCards(scenarios, program);
   }
 
   strategy.addEventListener("change", refresh);

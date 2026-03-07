@@ -16,6 +16,30 @@ function normalizeIntent(intent, index) {
   };
 }
 
+function normalizeProgram(program, index) {
+  var steps = Array.isArray(program && program.steps) ? program.steps : [];
+  return {
+    id: String(program && program.id ? program.id : "program-" + String(index + 1).padStart(3, "0")),
+    name: String(program && program.name ? program.name : "Unnamed program"),
+    strategy: String(program && program.strategy ? program.strategy : "policy-pivot"),
+    axis: String(program && program.axis ? program.axis : "structure"),
+    confidence: Math.max(1, Math.min(100, Math.round(Number(program && program.confidence ? program.confidence : 60)))),
+    disruption: Math.max(1, Math.min(6, Math.round(Number(program && program.disruption ? program.disruption : 3)))),
+    thesis: String(program && program.thesis ? program.thesis : ""),
+    steps: steps.map(function (step, stepIndex) {
+      return {
+        step: Math.max(1, Math.round(Number(step && step.step ? step.step : stepIndex + 1))),
+        axis: String(step && step.axis ? step.axis : "structure"),
+        date: String(step && step.date ? step.date : "unknown").slice(0, 10),
+        action: String(step && step.action ? step.action : ""),
+        detail: String(step && step.detail ? step.detail : ""),
+        files: normalizeFiles(step && step.files),
+        disruption: Math.max(1, Math.min(6, Math.round(Number(step && step.disruption ? step.disruption : 3))))
+      };
+    })
+  };
+}
+
 export function inferAxis(entry) {
   if (entry && typeof entry.axis === "string" && entry.axis) return entry.axis;
 
@@ -91,6 +115,7 @@ export function normalizeLedger(raw) {
       entries: legacyEntries,
       events: deriveEvents(legacyEntries),
       intents: [],
+      programs: [],
       metadata: {
         migrated: true,
         strategy: "derived-events"
@@ -113,15 +138,19 @@ export function normalizeLedger(raw) {
   var intents = Array.isArray(data.intents) && data.intents.length
     ? data.intents.map(normalizeIntent)
     : [];
+  var programs = Array.isArray(data.programs) && data.programs.length
+    ? data.programs.map(normalizeProgram)
+    : [];
 
-  var semantics = String(data.semantics || (intents.length ? "tri-ledger" : "dual-ledger"));
+  var semantics = String(data.semantics || (programs.length ? "quad-ledger" : intents.length ? "tri-ledger" : "dual-ledger"));
 
   return {
-    schema: String(data.schema || "memory-ledger@3"),
+    schema: String(data.schema || "memory-ledger@4"),
     semantics: semantics,
     entries: entries,
     events: events,
     intents: intents,
+    programs: programs,
     metadata: data.metadata && typeof data.metadata === "object" ? data.metadata : {}
   };
 }

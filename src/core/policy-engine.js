@@ -87,6 +87,20 @@ export function evaluatePolicy(model, policy) {
     ? checks.min_intent_alignment_score
     : 55;
 
+  var programTracks = model && model.programSummary && typeof model.programSummary.count === "number"
+    ? model.programSummary.count
+    : 0;
+  var minProgramTracks = typeof checks.min_program_tracks === "number"
+    ? checks.min_program_tracks
+    : 1;
+
+  var programConfidence = model && model.programSummary && typeof model.programSummary.averageConfidence === "number"
+    ? model.programSummary.averageConfidence
+    : 0;
+  var minProgramConfidence = typeof checks.min_program_confidence === "number"
+    ? checks.min_program_confidence
+    : 60;
+
   var results = [
     {
       id: "ui-core-repetition",
@@ -127,13 +141,29 @@ export function evaluatePolicy(model, policy) {
       threshold: minIntentAlignment,
       status: intentAlignment < minIntentAlignment ? "fail" : intentAlignment < (minIntentAlignment + 10) ? "warn" : "pass",
       detail: "Derived intent alignment: " + intentAlignment + " (target " + minIntentAlignment + "+)."
+    },
+    {
+      id: "program-tracks",
+      label: "Program track count",
+      value: programTracks,
+      threshold: minProgramTracks,
+      status: programTracks < minProgramTracks ? "fail" : programTracks === minProgramTracks ? "warn" : "pass",
+      detail: "Available execution programs: " + programTracks + " (target " + minProgramTracks + "+)."
+    },
+    {
+      id: "program-confidence",
+      label: "Program confidence",
+      value: programConfidence,
+      threshold: minProgramConfidence,
+      status: programConfidence < minProgramConfidence ? "fail" : programConfidence < (minProgramConfidence + 8) ? "warn" : "pass",
+      detail: "Average program confidence: " + programConfidence + " (target " + minProgramConfidence + "+)."
     }
   ];
 
   var status = overallStatus(results);
   var score = results.reduce(function (sum, check) {
-    if (check.status === "pass") return sum + 20;
-    if (check.status === "warn") return sum + 12;
+    if (check.status === "pass") return sum + 14;
+    if (check.status === "warn") return sum + 8;
     return sum;
   }, 0);
 
@@ -147,8 +177,8 @@ export function evaluatePolicy(model, policy) {
   var intent = status === "pass"
     ? "Policy intact. Continue broad-axis evolution with measured volatility."
     : status === "warn"
-      ? "Policy warning. Prefer underused axis: " + requiredAxis + "."
-      : "Policy breach. Force pivot into " + requiredAxis + " axis with non-UI touchpoints.";
+      ? "Policy warning. Prefer underused axis: " + requiredAxis + " and reinforce viable programs."
+      : "Policy breach. Force pivot into " + requiredAxis + " axis with non-UI touchpoints and stronger programs.";
 
   return {
     schema: policy.schema || "autonomy-policy@1",

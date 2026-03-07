@@ -25,6 +25,12 @@ function renderPriority(model) {
 
   root.innerHTML = "";
   var candidates = generateMutations(model, { novelty: 0.68, count: 3 });
+  var program = model.programs && model.programs.find(function (item) {
+    return model.policy && item.axis === model.policy.requiredAxis;
+  });
+  if (!program && model.programSummary) {
+    program = model.programSummary.primary;
+  }
 
   if (!candidates.length) {
     root.appendChild(create("p", "muted", "No policy-driven mutation candidates available."));
@@ -36,6 +42,9 @@ function renderPriority(model) {
     item.appendChild(create("h3", "", candidate.title));
     item.appendChild(create("p", "forge-meta", "Axis: " + candidate.axis + " · Impact: " + candidate.predictedImpact + "%"));
     item.appendChild(create("p", "", candidate.rationale));
+    if (program) {
+      item.appendChild(create("p", "muted", "Program: " + program.name + " (" + program.strategy + ", confidence " + program.confidence + ")."));
+    }
     root.appendChild(item);
   });
 }
@@ -60,7 +69,10 @@ export function renderGovernance(model) {
     return;
   }
 
-  safeText(summary, model.policy.intent);
+  var program = model.programSummary && model.programSummary.primary
+    ? " Program anchor: " + model.programSummary.primary.name + " (" + model.programSummary.primary.strategy + ")."
+    : "";
+  safeText(summary, model.policy.intent + program);
   safeText(schema, model.policy.schema + " (" + model.policy.updated + ")");
   var intentAlignment = model.intent ? model.intent.alignmentScore : null;
   safeText(score, String(model.policy.score) + (intentAlignment !== null ? " · intent " + intentAlignment : ""));

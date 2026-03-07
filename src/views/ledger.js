@@ -52,6 +52,27 @@ function renderIntentList(intents) {
   });
 }
 
+function renderProgramList(programs, axis) {
+  var list = byId("ledger-intents");
+  if (!list) return;
+
+  if (!programs.length) return;
+
+  var filtered = programs.filter(function (program) {
+    return axis === "all" || program.axis === axis;
+  });
+
+  filtered.forEach(function (program) {
+    var item = create("article", "ledger-event");
+    item.appendChild(create("h3", "", "Program: " + program.name));
+    item.appendChild(create("p", "ledger-meta", "axis " + program.axis + " · strategy " + program.strategy + " · confidence " + program.confidence + " · disruption " + program.disruption));
+    if (program.thesis) {
+      item.appendChild(create("p", "", program.thesis));
+    }
+    list.appendChild(item);
+  });
+}
+
 export function renderLedger(model) {
   var summary = byId("ledger-summary");
   var schema = byId("ledger-schema");
@@ -62,7 +83,7 @@ export function renderLedger(model) {
 
   if (!summary || !schema || !semantics || !typeCount || !intentCount) return;
 
-  safeText(summary, "Tri-ledger tracks " + model.eventSummary.count + " event(s) and " + model.intents.length + " intent(s). Latest event: " + model.eventSummary.latestDate + ".");
+  safeText(summary, "Quad-ledger tracks " + model.eventSummary.count + " event(s), " + model.intents.length + " intent(s), and " + model.programs.length + " program(s). Latest event: " + model.eventSummary.latestDate + ".");
   safeText(schema, model.ledgerSchema);
   safeText(semantics, model.ledgerSemantics);
   safeText(typeCount, String(Object.keys(model.eventSummary.byType).length));
@@ -84,6 +105,7 @@ export function renderLedger(model) {
         return axis === "all" || intent.axis === axis;
       });
     renderIntentList(intents);
+    renderProgramList(model.programs || [], axis);
   }
 
   if (axisFilter) {

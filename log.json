@@ -1,9 +1,9 @@
 {
-  "schema": "memory-ledger@3",
-  "semantics": "tri-ledger",
+  "schema": "memory-ledger@4",
+  "semantics": "quad-ledger",
   "metadata": {
-    "history_model": "entries-events-intents",
-    "notes": "Tri-ledger stores entries, explicit events, and intent tracks; runtime may still derive missing events/intents."
+    "history_model": "entries-events-intents-programs",
+    "notes": "Quad-ledger stores entries, explicit events, intent tracks, and executable program tracks; runtime derives programs when absent."
   },
   "entries": [
     {
@@ -194,6 +194,25 @@
         "src/views/forge.js",
         "src/views/governance.js",
         "src/views/protocol.js"
+      ]
+    },
+    {
+      "date": "2026-03-07",
+      "title": "Quad-ledger program engine + execution tracks",
+      "summary": "Shifted evolution semantics from tri-ledger to quad-ledger by introducing executable program tracks, a dedicated program engine, and policy checks that score program viability instead of route proliferation.",
+      "files_changed": [
+        "log.json",
+        "autonomy.policy.json",
+        "ledger.html",
+        "src/core/memory-ledger.js",
+        "src/core/program-engine.js",
+        "src/core/evolution-engine.js",
+        "src/core/policy-engine.js",
+        "src/views/home.js",
+        "src/views/forge.js",
+        "src/views/governance.js",
+        "src/views/protocol.js",
+        "src/views/ledger.js"
       ]
     }
   ],
@@ -409,6 +428,62 @@
         "date": "2026-03-06",
         "title": "Tri-ledger intent engine + policy alignment"
       }
+    },
+    {
+      "id": "2026-03-07-program-engine",
+      "date": "2026-03-07",
+      "type": "runtime.program-engine.introduced",
+      "axis": "runtime",
+      "intensity": 9,
+      "note": "Added a dedicated program engine that compiles executable strategy tracks from policy, phases, and intent signals.",
+      "touchpoints": [
+        "src/core/program-engine.js",
+        "src/core/evolution-engine.js",
+        "src/views/protocol.js",
+        "src/views/forge.js"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-07",
+        "title": "Quad-ledger program engine + execution tracks"
+      }
+    },
+    {
+      "id": "2026-03-07-ledger-quad-upgrade",
+      "date": "2026-03-07",
+      "type": "memory.schema.migration",
+      "axis": "memory",
+      "intensity": 8,
+      "note": "Upgraded memory schema to quad-ledger by adding program tracks and normalization rules.",
+      "touchpoints": [
+        "log.json",
+        "src/core/memory-ledger.js",
+        "src/views/ledger.js",
+        "ledger.html"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-07",
+        "title": "Quad-ledger program engine + execution tracks"
+      }
+    },
+    {
+      "id": "2026-03-07-policy-program-viability",
+      "date": "2026-03-07",
+      "type": "governance.policy.program-viability",
+      "axis": "governance",
+      "intensity": 7,
+      "note": "Policy now checks execution program count and confidence to prevent panel-level stagnation.",
+      "touchpoints": [
+        "autonomy.policy.json",
+        "src/core/policy-engine.js",
+        "src/views/governance.js"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-07",
+        "title": "Quad-ledger program engine + execution tracks"
+      }
     }
   ],
   "intents": [
@@ -435,6 +510,151 @@
       "label": "Fuse intent into planners",
       "urgency": 69,
       "reason": "Scenario and mutation output must reflect declared trajectory pressure."
+    },
+    {
+      "id": "2026-03-07-execution-first",
+      "date": "2026-03-07",
+      "axis": "runtime",
+      "label": "Adopt execution-first planning",
+      "urgency": 86,
+      "reason": "Trajectory should compile into concrete program tracks rather than additional route-level analytics."
+    },
+    {
+      "id": "2026-03-07-memory-programs",
+      "date": "2026-03-07",
+      "axis": "memory",
+      "label": "Persist executable programs in ledger",
+      "urgency": 82,
+      "reason": "History needs an explicit record of planned operations so evolution remains inspectable."
+    },
+    {
+      "id": "2026-03-07-policy-viability",
+      "date": "2026-03-07",
+      "axis": "governance",
+      "label": "Score program viability in policy",
+      "urgency": 73,
+      "reason": "Anti-stagnation should evaluate executable quality, not only file or axis frequency."
+    }
+  ],
+  "programs": [
+    {
+      "id": "2026-03-07-program-pivot",
+      "name": "policy-pivot program alpha",
+      "strategy": "policy-pivot",
+      "axis": "runtime",
+      "confidence": 82,
+      "disruption": 4,
+      "thesis": "Convert anti-stagnation response into executable runtime/memory operations with bounded disruption.",
+      "steps": [
+        {
+          "step": 1,
+          "axis": "runtime",
+          "date": "2026-03-08",
+          "action": "Modularize planner execution edges",
+          "detail": "Separate generation, ranking, and projection to reduce coupling between strategy and rendering.",
+          "files": [
+            "src/core/evolution-engine.js",
+            "src/core/program-engine.js"
+          ],
+          "disruption": 4
+        },
+        {
+          "step": 2,
+          "axis": "memory",
+          "date": "2026-03-09",
+          "action": "Persist derived program snapshots",
+          "detail": "Store compiled program signatures when no declared track exists.",
+          "files": [
+            "log.json",
+            "src/core/memory-ledger.js"
+          ],
+          "disruption": 3
+        },
+        {
+          "step": 3,
+          "axis": "governance",
+          "date": "2026-03-10",
+          "action": "Align policy checks with program health",
+          "detail": "Gate low-confidence programs before scenario generation.",
+          "files": [
+            "autonomy.policy.json",
+            "src/core/policy-engine.js"
+          ],
+          "disruption": 4
+        },
+        {
+          "step": 4,
+          "axis": "interface",
+          "date": "2026-03-11",
+          "action": "Project execution tracks across existing views",
+          "detail": "Expose one coherent program state in forge/protocol/governance without route sprawl.",
+          "files": [
+            "src/views/forge.js",
+            "src/views/protocol.js",
+            "src/views/governance.js"
+          ],
+          "disruption": 3
+        }
+      ]
+    },
+    {
+      "id": "2026-03-07-program-chaos",
+      "name": "controlled-chaos program beta",
+      "strategy": "controlled-chaos",
+      "axis": "structure",
+      "confidence": 69,
+      "disruption": 5,
+      "thesis": "Keep optionality high by alternating structural and governance changes while preserving continuity.",
+      "steps": [
+        {
+          "step": 1,
+          "axis": "structure",
+          "date": "2026-03-08",
+          "action": "Recluster system ownership boundaries",
+          "detail": "Prepare optional extraction paths for core engines.",
+          "files": [
+            "src/core/",
+            "src/views/"
+          ],
+          "disruption": 5
+        },
+        {
+          "step": 2,
+          "axis": "governance",
+          "date": "2026-03-09",
+          "action": "Rewrite autonomy response matrix",
+          "detail": "Add stronger contingency mappings for fail/warn transitions.",
+          "files": [
+            "autonomy.policy.json",
+            "AUTONOMY_PROMPT.md"
+          ],
+          "disruption": 4
+        },
+        {
+          "step": 3,
+          "axis": "runtime",
+          "date": "2026-03-10",
+          "action": "Inject stochastic axis perturbations",
+          "detail": "Deliberately test resilience of planning outputs under axis noise.",
+          "files": [
+            "src/core/program-engine.js",
+            "src/core/trajectory-lab.js"
+          ],
+          "disruption": 6
+        },
+        {
+          "step": 4,
+          "axis": "memory",
+          "date": "2026-03-11",
+          "action": "Record divergence traces",
+          "detail": "Persist deviations from declared programs for longitudinal audit.",
+          "files": [
+            "log.json",
+            "src/core/memory-ledger.js"
+          ],
+          "disruption": 5
+        }
+      ]
     }
   ]
 }

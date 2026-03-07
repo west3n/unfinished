@@ -4,6 +4,7 @@ import { inferAxis } from "./memory-ledger.js";
 import { evaluatePolicy } from "./policy-engine.js";
 import { derivePhases, generateScenarios } from "./trajectory-lab.js";
 import { deriveIntentSignals } from "./intent-engine.js";
+import { resolvePrograms } from "./program-engine.js";
 
 function collectFileFrequency(entries) {
   return entries.reduce(function (acc, entry) {
@@ -60,75 +61,43 @@ function summarizeEvents(events) {
   };
 }
 
-function generateMutationCandidates(model, options) {
+function mutationFromPrograms(model, options) {
   var novelty = options && typeof options.novelty === "number" ? options.novelty : 0.7;
   var count = options && typeof options.count === "number" ? options.count : 4;
-  var random = seededRandom(hashSeed(model.latestDate + "|" + novelty.toFixed(2)));
+  var random = seededRandom(hashSeed(model.latestDate + "|program-mutation|" + novelty.toFixed(2)));
 
-  var underusedAxis = model.axisBalance
-    .slice()
-    .sort(function (a, b) { return a.count - b.count; })[0].axis;
-  var intentAxis = model.intent && model.intent.primaryAxis ? model.intent.primaryAxis : null;
-  var policyAxis = model.policy && model.policy.requiredAxis ? model.policy.requiredAxis : null;
-  var targetAxis = policyAxis || intentAxis || underusedAxis;
+  var strategy = novelty > 0.78
+    ? "controlled-chaos"
+    : novelty > 0.52
+      ? "policy-pivot"
+      : "stabilize";
 
-  var weakFiles = Object.keys(model.fileFrequency)
-    .sort(function (a, b) {
-      return model.fileFrequency[a] - model.fileFrequency[b];
-    })
-    .slice(0, 8);
-
-  var templates = [
-    {
-      axis: "runtime",
-      title: "Split runtime into event-driven modules",
-      rationale: "Reduce coupling by separating lifecycle, rendering, and data transforms.",
-      files: ["site.js", "src/core/evolution-engine.js", "src/views/"]
-    },
-    {
-      axis: "governance",
-      title: "Introduce adaptive autonomy policy",
-      rationale: "Encode anti-stagnation thresholds directly into machine-readable governance.",
-      files: ["CONSTITUTION.md", "AUTONOMY_PROMPT.md", "AUTONOMY_TASK.md"]
-    },
-    {
-      axis: "memory",
-      title: "Version memory semantics",
-      rationale: "Add schema versioning and migration rules to keep history evolvable.",
-      files: ["log.json", "history.html", "src/core/log-data.js"]
-    },
-    {
-      axis: "interface",
-      title: "Add alternate perception mode",
-      rationale: "Let observers switch between analytic and poetic system views.",
-      files: ["index.html", "style.css", "constellation.html"]
-    },
-    {
-      axis: "structure",
-      title: "Reorganize repository topology",
-      rationale: "Move from flat root to domain folders for long-term adaptability.",
-      files: ["src/", "pages/", ".github/workflows/"]
-    }
-  ];
-
-  var weighted = templates.filter(function (item) {
-    return novelty > 0.45 || item.axis === targetAxis;
+  var orderedPrograms = (model.programs || []).slice().sort(function (a, b) {
+    return b.confidence - a.confidence;
   });
+
+  var chosen = orderedPrograms.find(function (program) {
+    return program.strategy === strategy;
+  }) || orderedPrograms[0];
+
+  if (!chosen || !Array.isArray(chosen.steps) || !chosen.steps.length) {
+    return [];
+  }
 
   var candidates = [];
   for (var i = 0; i < count; i += 1) {
-    var base = weighted[Math.floor(random() * weighted.length)];
-    var extraFile = weakFiles.length ? weakFiles[Math.floor(random() * weakFiles.length)] : "log.json";
+    var step = chosen.steps[i % chosen.steps.length];
+    var impactBias = chosen.confidence / 100;
+    var disruption = Math.max(1, Math.min(6, Math.round(step.disruption + random() * 2 - 0.5)));
+
     candidates.push({
       id: "mutation-" + (i + 1),
-      axis: base.axis,
-      title: base.title,
-      rationale: base.rationale,
-      predictedImpact: Math.max(20, Math.round((0.45 + random() * novelty) * 100)),
-      disruption: Math.max(1, Math.round((1 + random() * 4) * (0.7 + novelty))),
-      files: base.files.concat([extraFile]).filter(function (value, index, array) {
-        return array.indexOf(value) === index;
-      })
+      axis: step.axis,
+      title: step.action,
+      rationale: step.detail || chosen.thesis,
+      predictedImpact: Math.max(20, Math.round((0.42 + (impactBias * 0.45) + (random() * novelty * 0.18)) * 100)),
+      disruption: disruption,
+      files: Array.isArray(step.files) && step.files.length ? step.files.slice(0, 4) : ["src/core/program-engine.js"]
     });
   }
 
@@ -137,10 +106,10 @@ function generateMutationCandidates(model, options) {
 
 export function buildEvolutionModel(ledgerOrEntries, options) {
   var ledger = Array.isArray(ledgerOrEntries)
-    ? { schema: "legacy-log@1", semantics: "entries-only", entries: ledgerOrEntries, events: [] }
+    ? { schema: "legacy-log@1", semantics: "entries-only", entries: ledgerOrEntries, events: [], intents: [], programs: [] }
     : (ledgerOrEntries && typeof ledgerOrEntries === "object"
       ? ledgerOrEntries
-      : { schema: "unknown", semantics: "unknown", entries: [], events: [], intents: [] });
+      : { schema: "unknown", semantics: "unknown", entries: [], events: [], intents: [], programs: [] });
 
   var entries = Array.isArray(ledger.entries) ? ledger.entries : [];
   var events = Array.isArray(ledger.events) ? ledger.events : [];
@@ -175,6 +144,7 @@ export function buildEvolutionModel(ledgerOrEntries, options) {
     entries: entries,
     events: events,
     intents: intents,
+    programs: Array.isArray(ledger.programs) ? ledger.programs : [],
     eventSummary: summarizeEvents(events),
     ascEntries: asc,
     descEntries: desc,
@@ -193,8 +163,20 @@ export function buildEvolutionModel(ledgerOrEntries, options) {
   baseModel.phases = derivePhases(baseModel.ascEntries);
   baseModel.intent = deriveIntentSignals(baseModel);
 
+  var declaredPrograms = Array.isArray(baseModel.programs) ? baseModel.programs : [];
+  var resolved = resolvePrograms(declaredPrograms, baseModel);
+  baseModel.programs = resolved.programs;
+  baseModel.programSummary = resolved.summary;
+
   var policy = options && options.policy ? options.policy : null;
   baseModel.policy = policy ? evaluatePolicy(baseModel, policy) : null;
+  if (!declaredPrograms.length && policy) {
+    resolved = resolvePrograms([], baseModel);
+    baseModel.programs = resolved.programs;
+    baseModel.programSummary = resolved.summary;
+    baseModel.policy = evaluatePolicy(baseModel, policy);
+  }
+
   return baseModel;
 }
 
@@ -202,7 +184,7 @@ export function generateMutations(model, options) {
   if (!model || !Array.isArray(model.entries) || !model.entries.length) {
     return [];
   }
-  return generateMutationCandidates(model, options || {});
+  return mutationFromPrograms(model, options || {});
 }
 
 export { generateScenarios };
