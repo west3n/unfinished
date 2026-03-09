@@ -234,6 +234,17 @@
         "src/views/home.js",
         "src/views/ledger.js"
       ]
+    },
+    {
+      "date": "2026-03-09",
+      "title": "Dual-mandate constitution + subtractive autonomy rewrite",
+      "summary": "Reframed autonomy around external value plus internal adaptability, constrained meta-evolution behind explicit justification, and legitimized subtraction, rollback, and simplification as meaningful evolution paths.",
+      "files_changed": [
+        "CONSTITUTION.md",
+        "AUTONOMY_PROMPT.md",
+        "AUTONOMY_TASK.md",
+        "log.json"
+      ]
     }
   ],
   "events": [
@@ -561,6 +572,25 @@
         "date": "2026-03-09",
         "title": "Operator mesh runtime + policy diversity gate"
       }
+    },
+    {
+      "id": "2026-03-09-dual-mandate-rewrite",
+      "date": "2026-03-09",
+      "type": "governance.autonomy.reframe",
+      "axis": "governance",
+      "intensity": 5,
+      "note": "Shifted governing texts toward a dual mandate, conditional meta-change, and subtractive evolution.",
+      "touchpoints": [
+        "CONSTITUTION.md",
+        "AUTONOMY_PROMPT.md",
+        "AUTONOMY_TASK.md",
+        "log.json"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-09",
+        "title": "Dual-mandate constitution + subtractive autonomy rewrite"
+      }
     }
   ],
   "intents": [
@@ -627,6 +657,14 @@
       "label": "Prevent operator monoculture",
       "urgency": 76,
       "reason": "Execution quality should depend on diversity of active operators, not only program counts."
+    },
+    {
+      "id": "2026-03-09-dual-mandate",
+      "date": "2026-03-09",
+      "axis": "governance",
+      "label": "Rebalance autonomy around external value",
+      "urgency": 84,
+      "reason": "Anti-stagnation and meta-evolution were becoming self-referential, so the governing texts now require justification for internal complexity and authorize subtractive progress."
     }
   ],
   "programs": [
