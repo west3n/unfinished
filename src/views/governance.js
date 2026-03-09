@@ -72,7 +72,10 @@ export function renderGovernance(model) {
   var program = model.programSummary && model.programSummary.primary
     ? " Program anchor: " + model.programSummary.primary.name + " (" + model.programSummary.primary.strategy + ")."
     : "";
-  safeText(summary, model.policy.intent + program);
+  var operatorLine = model.operatorSummary
+    ? " Operator axes: " + Object.keys(model.operatorSummary.byAxis || {}).length + "."
+    : "";
+  safeText(summary, model.policy.intent + program + operatorLine);
   safeText(schema, model.policy.schema + " (" + model.policy.updated + ")");
   var intentAlignment = model.intent ? model.intent.alignmentScore : null;
   safeText(score, String(model.policy.score) + (intentAlignment !== null ? " · intent " + intentAlignment : ""));

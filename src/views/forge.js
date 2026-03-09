@@ -15,6 +15,7 @@ function renderCandidateList(candidates, program) {
     var item = create("article", "forge-item");
     item.appendChild(create("h3", "", candidate.title));
     item.appendChild(create("p", "forge-meta", "Axis: " + candidate.axis + " · Impact: " + candidate.predictedImpact + "% · Disruption: " + candidate.disruption + "/6"));
+    item.appendChild(create("p", "muted", "Operator: " + (candidate.operatorId || "unknown") + " · Window: " + (candidate.date || "unscheduled")));
     item.appendChild(create("p", "", candidate.rationale));
 
     if (program && Array.isArray(program.steps) && program.steps[index % program.steps.length]) {

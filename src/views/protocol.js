@@ -54,6 +54,9 @@ function renderScenarioCards(scenarios, program) {
       } else {
         item.textContent = step.date + " · " + step.axis + " · D" + step.disruption + " · " + step.action;
       }
+      if (step.operatorId) {
+        item.textContent += " · op " + step.operatorId;
+      }
       list.appendChild(item);
     });
 

@@ -1,10 +1,10 @@
 import { computeStreaks, detectRepetition, sortByDateAsc, sortByDateDesc, summarizeCadence, uniqueDays } from "./log-data.js";
-import { hashSeed, seededRandom } from "../shared/random.js";
 import { inferAxis } from "./memory-ledger.js";
 import { evaluatePolicy } from "./policy-engine.js";
 import { derivePhases, generateScenarios } from "./trajectory-lab.js";
 import { deriveIntentSignals } from "./intent-engine.js";
 import { resolvePrograms } from "./program-engine.js";
+import { selectOperators, summarizeOperators } from "./mutation-operators.js";
 
 function collectFileFrequency(entries) {
   return entries.reduce(function (acc, entry) {
@@ -61,47 +61,11 @@ function summarizeEvents(events) {
   };
 }
 
-function mutationFromPrograms(model, options) {
-  var novelty = options && typeof options.novelty === "number" ? options.novelty : 0.7;
-  var count = options && typeof options.count === "number" ? options.count : 4;
-  var random = seededRandom(hashSeed(model.latestDate + "|program-mutation|" + novelty.toFixed(2)));
-
-  var strategy = novelty > 0.78
-    ? "controlled-chaos"
-    : novelty > 0.52
-      ? "policy-pivot"
-      : "stabilize";
-
-  var orderedPrograms = (model.programs || []).slice().sort(function (a, b) {
-    return b.confidence - a.confidence;
-  });
-
-  var chosen = orderedPrograms.find(function (program) {
-    return program.strategy === strategy;
-  }) || orderedPrograms[0];
-
-  if (!chosen || !Array.isArray(chosen.steps) || !chosen.steps.length) {
-    return [];
-  }
-
-  var candidates = [];
-  for (var i = 0; i < count; i += 1) {
-    var step = chosen.steps[i % chosen.steps.length];
-    var impactBias = chosen.confidence / 100;
-    var disruption = Math.max(1, Math.min(6, Math.round(step.disruption + random() * 2 - 0.5)));
-
-    candidates.push({
-      id: "mutation-" + (i + 1),
-      axis: step.axis,
-      title: step.action,
-      rationale: step.detail || chosen.thesis,
-      predictedImpact: Math.max(20, Math.round((0.42 + (impactBias * 0.45) + (random() * novelty * 0.18)) * 100)),
-      disruption: disruption,
-      files: Array.isArray(step.files) && step.files.length ? step.files.slice(0, 4) : ["src/core/program-engine.js"]
-    });
-  }
-
-  return candidates;
+function strategyFromNovelty(model, novelty) {
+  if (model && model.policy && model.policy.actionMode === "force-structural-pivot") return "controlled-chaos";
+  if (novelty > 0.78) return "controlled-chaos";
+  if (novelty > 0.52) return "policy-pivot";
+  return "stabilize";
 }
 
 export function buildEvolutionModel(ledgerOrEntries, options) {
@@ -167,6 +131,13 @@ export function buildEvolutionModel(ledgerOrEntries, options) {
   var resolved = resolvePrograms(declaredPrograms, baseModel);
   baseModel.programs = resolved.programs;
   baseModel.programSummary = resolved.summary;
+  baseModel.operatorSummary = summarizeOperators(selectOperators(baseModel, {
+    strategy: baseModel.programSummary && baseModel.programSummary.primary ? baseModel.programSummary.primary.strategy : "policy-pivot",
+    novelty: 0.66,
+    variance: 0.57,
+    count: 6,
+    targetAxis: null
+  }));
 
   var policy = options && options.policy ? options.policy : null;
   baseModel.policy = policy ? evaluatePolicy(baseModel, policy) : null;
@@ -174,6 +145,13 @@ export function buildEvolutionModel(ledgerOrEntries, options) {
     resolved = resolvePrograms([], baseModel);
     baseModel.programs = resolved.programs;
     baseModel.programSummary = resolved.summary;
+    baseModel.operatorSummary = summarizeOperators(selectOperators(baseModel, {
+      strategy: baseModel.programSummary && baseModel.programSummary.primary ? baseModel.programSummary.primary.strategy : "policy-pivot",
+      novelty: 0.66,
+      variance: 0.57,
+      count: 6,
+      targetAxis: baseModel.policy ? baseModel.policy.requiredAxis : null
+    }));
     baseModel.policy = evaluatePolicy(baseModel, policy);
   }
 
@@ -184,7 +162,40 @@ export function generateMutations(model, options) {
   if (!model || !Array.isArray(model.entries) || !model.entries.length) {
     return [];
   }
-  return mutationFromPrograms(model, options || {});
+
+  var novelty = options && typeof options.novelty === "number" ? options.novelty : 0.7;
+  var count = options && typeof options.count === "number" ? options.count : 4;
+  var strategy = strategyFromNovelty(model, novelty);
+
+  var program = model.programs && model.programs.find(function (item) {
+    return item.strategy === strategy;
+  });
+
+  var operators = selectOperators(model, {
+    strategy: strategy,
+    novelty: novelty,
+    variance: 0.45 + novelty * 0.4,
+    count: count,
+    targetAxis: model.policy ? model.policy.requiredAxis : null
+  });
+
+  return operators.map(function (operator, index) {
+    var scheduled = program && Array.isArray(program.steps) && program.steps.length
+      ? program.steps[index % program.steps.length]
+      : null;
+
+    return {
+      id: "mutation-" + (index + 1),
+      operatorId: operator.id,
+      axis: operator.axis,
+      title: operator.name,
+      rationale: operator.detail,
+      predictedImpact: operator.impact,
+      disruption: operator.disruption,
+      files: operator.files,
+      date: scheduled ? scheduled.date : model.latestDate
+    };
+  });
 }
 
 export { generateScenarios };

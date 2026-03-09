@@ -83,7 +83,8 @@ export function renderLedger(model) {
 
   if (!summary || !schema || !semantics || !typeCount || !intentCount) return;
 
-  safeText(summary, "Quad-ledger tracks " + model.eventSummary.count + " event(s), " + model.intents.length + " intent(s), and " + model.programs.length + " program(s). Latest event: " + model.eventSummary.latestDate + ".");
+  var operatorAxes = model.operatorSummary ? Object.keys(model.operatorSummary.byAxis || {}).length : 0;
+  safeText(summary, "Quad-ledger tracks " + model.eventSummary.count + " event(s), " + model.intents.length + " intent(s), and " + model.programs.length + " program(s). Active operators span " + operatorAxes + " axes. Latest event: " + model.eventSummary.latestDate + ".");
   safeText(schema, model.ledgerSchema);
   safeText(semantics, model.ledgerSemantics);
   safeText(typeCount, String(Object.keys(model.eventSummary.byType).length));

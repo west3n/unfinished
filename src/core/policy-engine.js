@@ -72,6 +72,18 @@ function overallStatus(checks) {
   return "pass";
 }
 
+function scoreChecks(results) {
+  if (!results.length) return 0;
+
+  var points = results.reduce(function (sum, check) {
+    if (check.status === "pass") return sum + 1;
+    if (check.status === "warn") return sum + 0.55;
+    return sum;
+  }, 0);
+
+  return Math.round((points / results.length) * 100);
+}
+
 export function evaluatePolicy(model, policy) {
   var checks = policy && policy.checks ? policy.checks : {};
   var descEntries = Array.isArray(model.descEntries) ? model.descEntries : [];
@@ -100,6 +112,13 @@ export function evaluatePolicy(model, policy) {
   var minProgramConfidence = typeof checks.min_program_confidence === "number"
     ? checks.min_program_confidence
     : 60;
+
+  var operatorDiversity = model && model.operatorSummary && model.operatorSummary.byAxis
+    ? Object.keys(model.operatorSummary.byAxis).length
+    : 0;
+  var minOperatorDiversity = typeof checks.min_operator_axis_diversity === "number"
+    ? checks.min_operator_axis_diversity
+    : 3;
 
   var results = [
     {
@@ -157,15 +176,19 @@ export function evaluatePolicy(model, policy) {
       threshold: minProgramConfidence,
       status: programConfidence < minProgramConfidence ? "fail" : programConfidence < (minProgramConfidence + 8) ? "warn" : "pass",
       detail: "Average program confidence: " + programConfidence + " (target " + minProgramConfidence + "+)."
+    },
+    {
+      id: "operator-diversity",
+      label: "Operator axis diversity",
+      value: operatorDiversity,
+      threshold: minOperatorDiversity,
+      status: operatorDiversity < minOperatorDiversity ? "fail" : operatorDiversity === minOperatorDiversity ? "warn" : "pass",
+      detail: "Distinct axes in active operator plan: " + operatorDiversity + " (target " + minOperatorDiversity + "+)."
     }
   ];
 
   var status = overallStatus(results);
-  var score = results.reduce(function (sum, check) {
-    if (check.status === "pass") return sum + 14;
-    if (check.status === "warn") return sum + 8;
-    return sum;
-  }, 0);
+  var score = scoreChecks(results);
 
   var requiredAxis = pickRequiredAxis(model.axisBalance);
   var actionMode = status === "fail"

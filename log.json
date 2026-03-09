@@ -3,7 +3,7 @@
   "semantics": "quad-ledger",
   "metadata": {
     "history_model": "entries-events-intents-programs",
-    "notes": "Quad-ledger stores entries, explicit events, intent tracks, and executable program tracks; runtime derives programs when absent."
+    "notes": "Quad-ledger stores entries, explicit events, intent tracks, and executable program tracks; runtime derives programs when absent. Operator mesh now unifies mutation, scenario, and program synthesis."
   },
   "entries": [
     {
@@ -212,6 +212,26 @@
         "src/views/forge.js",
         "src/views/governance.js",
         "src/views/protocol.js",
+        "src/views/ledger.js"
+      ]
+    },
+    {
+      "date": "2026-03-09",
+      "title": "Operator mesh runtime + policy diversity gate",
+      "summary": "Introduced a shared mutation-operator registry that now drives programs, scenarios, and forge candidates, then extended governance with operator-diversity checks to prevent planner monoculture.",
+      "files_changed": [
+        "autonomy.policy.json",
+        "log.json",
+        "src/core/mutation-operators.js",
+        "src/core/evolution-engine.js",
+        "src/core/program-engine.js",
+        "src/core/trajectory-lab.js",
+        "src/core/policy-engine.js",
+        "src/core/policy-data.js",
+        "src/views/forge.js",
+        "src/views/protocol.js",
+        "src/views/governance.js",
+        "src/views/home.js",
         "src/views/ledger.js"
       ]
     }
@@ -484,6 +504,63 @@
         "date": "2026-03-07",
         "title": "Quad-ledger program engine + execution tracks"
       }
+    },
+    {
+      "id": "2026-03-09-operator-mesh",
+      "date": "2026-03-09",
+      "type": "runtime.operator-mesh.unification",
+      "axis": "runtime",
+      "intensity": 9,
+      "note": "Unified mutation, scenario, and program generation through a shared operator registry.",
+      "touchpoints": [
+        "src/core/mutation-operators.js",
+        "src/core/evolution-engine.js",
+        "src/core/program-engine.js",
+        "src/core/trajectory-lab.js"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-09",
+        "title": "Operator mesh runtime + policy diversity gate"
+      }
+    },
+    {
+      "id": "2026-03-09-policy-operator-diversity",
+      "date": "2026-03-09",
+      "type": "governance.policy.operator-diversity",
+      "axis": "governance",
+      "intensity": 7,
+      "note": "Added policy checks for operator-axis diversity and normalized all policy threshold fields.",
+      "touchpoints": [
+        "autonomy.policy.json",
+        "src/core/policy-engine.js",
+        "src/core/policy-data.js"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-09",
+        "title": "Operator mesh runtime + policy diversity gate"
+      }
+    },
+    {
+      "id": "2026-03-09-view-operator-projection",
+      "date": "2026-03-09",
+      "type": "interface.projection.operator-state",
+      "axis": "interface",
+      "intensity": 4,
+      "note": "Projected operator identifiers and coverage into forge, protocol, home, governance, and ledger views.",
+      "touchpoints": [
+        "src/views/forge.js",
+        "src/views/protocol.js",
+        "src/views/governance.js",
+        "src/views/home.js",
+        "src/views/ledger.js"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-09",
+        "title": "Operator mesh runtime + policy diversity gate"
+      }
     }
   ],
   "intents": [
@@ -534,6 +611,22 @@
       "label": "Score program viability in policy",
       "urgency": 73,
       "reason": "Anti-stagnation should evaluate executable quality, not only file or axis frequency."
+    },
+    {
+      "id": "2026-03-09-runtime-operator-mesh",
+      "date": "2026-03-09",
+      "axis": "runtime",
+      "label": "Unify planners with operator mesh",
+      "urgency": 89,
+      "reason": "Separate planners were drifting toward duplicated logic and inconsistent axis pressure handling."
+    },
+    {
+      "id": "2026-03-09-governance-diversity-gate",
+      "date": "2026-03-09",
+      "axis": "governance",
+      "label": "Prevent operator monoculture",
+      "urgency": 76,
+      "reason": "Execution quality should depend on diversity of active operators, not only program counts."
     }
   ],
   "programs": [
@@ -653,6 +746,66 @@
             "src/core/memory-ledger.js"
           ],
           "disruption": 5
+        }
+      ]
+    },
+    {
+      "id": "2026-03-09-program-operator-mesh",
+      "name": "operator-mesh program gamma",
+      "strategy": "policy-pivot",
+      "axis": "runtime",
+      "confidence": 84,
+      "disruption": 4,
+      "thesis": "Stabilize trajectory generation by routing programs, scenarios, and mutations through one shared operator registry.",
+      "steps": [
+        {
+          "step": 1,
+          "axis": "runtime",
+          "date": "2026-03-10",
+          "action": "Harden operator scoring hooks",
+          "detail": "Expose deterministic score components for policy and observability audits.",
+          "files": [
+            "src/core/mutation-operators.js",
+            "src/core/evolution-engine.js"
+          ],
+          "disruption": 4
+        },
+        {
+          "step": 2,
+          "axis": "governance",
+          "date": "2026-03-11",
+          "action": "Tie responses to operator health",
+          "detail": "Escalate fail and warn response mapping when operator diversity collapses.",
+          "files": [
+            "autonomy.policy.json",
+            "src/core/policy-engine.js"
+          ],
+          "disruption": 3
+        },
+        {
+          "step": 3,
+          "axis": "memory",
+          "date": "2026-03-12",
+          "action": "Persist operator snapshots in ledger",
+          "detail": "Record selected operator sets for each run to improve longitudinal explainability.",
+          "files": [
+            "log.json",
+            "src/core/memory-ledger.js"
+          ],
+          "disruption": 4
+        },
+        {
+          "step": 4,
+          "axis": "interface",
+          "date": "2026-03-13",
+          "action": "Render operator lineage",
+          "detail": "Surface operator continuity and divergence alongside existing program tracks.",
+          "files": [
+            "src/views/protocol.js",
+            "src/views/ledger.js",
+            "src/views/forge.js"
+          ],
+          "disruption": 3
         }
       ]
     }

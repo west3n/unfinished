@@ -1,5 +1,5 @@
 var fallbackPolicy = {
-  schema: "autonomy-policy@2",
+  schema: "autonomy-policy@4",
   updated: "1970-01-01",
   mode: "fallback",
   checks: {
@@ -7,7 +7,10 @@ var fallbackPolicy = {
     min_axis_coverage_last_5: 3,
     min_non_ui_touchpoints_last_3: 2,
     max_latest_gap_days: 1,
-    min_intent_alignment_score: 55
+    min_intent_alignment_score: 55,
+    min_program_tracks: 2,
+    min_program_confidence: 64,
+    min_operator_axis_diversity: 3
   },
   responses: {
     on_warn: "prioritize-underused-axis",
@@ -34,7 +37,10 @@ export function normalizePolicy(raw) {
       min_axis_coverage_last_5: normalizeNumber(checks.min_axis_coverage_last_5, fallbackPolicy.checks.min_axis_coverage_last_5),
       min_non_ui_touchpoints_last_3: normalizeNumber(checks.min_non_ui_touchpoints_last_3, fallbackPolicy.checks.min_non_ui_touchpoints_last_3),
       max_latest_gap_days: normalizeNumber(checks.max_latest_gap_days, fallbackPolicy.checks.max_latest_gap_days),
-      min_intent_alignment_score: normalizeNumber(checks.min_intent_alignment_score, fallbackPolicy.checks.min_intent_alignment_score)
+      min_intent_alignment_score: normalizeNumber(checks.min_intent_alignment_score, fallbackPolicy.checks.min_intent_alignment_score),
+      min_program_tracks: normalizeNumber(checks.min_program_tracks, fallbackPolicy.checks.min_program_tracks),
+      min_program_confidence: normalizeNumber(checks.min_program_confidence, fallbackPolicy.checks.min_program_confidence),
+      min_operator_axis_diversity: normalizeNumber(checks.min_operator_axis_diversity, fallbackPolicy.checks.min_operator_axis_diversity)
     },
     responses: {
       on_warn: String(responses.on_warn || fallbackPolicy.responses.on_warn),

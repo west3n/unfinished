@@ -204,6 +204,10 @@ function renderIntent(model) {
       " (" + model.programSummary.primary.strategy + ", confidence " +
       model.programSummary.primary.confidence + ").";
   }
+  var operatorLine = "";
+  if (model.operatorSummary) {
+    operatorLine = " Operator coverage: " + Object.keys(model.operatorSummary.byAxis || {}).length + " axes.";
+  }
 
   if (model.intent && Array.isArray(model.intent.tracks) && model.intent.tracks.length) {
     var lead = model.intent.tracks[0];
@@ -211,27 +215,27 @@ function renderIntent(model) {
       intent,
       "Evolution intent: " + lead.label + " (" + lead.axis + ", urgency " + lead.urgency + "). " +
       "Alignment " + model.intent.alignmentScore + "/100, novelty debt " + model.intent.noveltyDebt + "." +
-      programLine
+      programLine + operatorLine
     );
     return;
   }
 
   if (model.policy) {
-    safeText(intent, "Evolution intent: " + model.policy.intent + " Required axis: " + model.policy.requiredAxis + "." + programLine);
+    safeText(intent, "Evolution intent: " + model.policy.intent + " Required axis: " + model.policy.requiredAxis + "." + programLine + operatorLine);
     return;
   }
 
   if (model.ledgerSemantics === "dual-ledger") {
-    safeText(intent, "Evolution intent: maintain dual-ledger memory (entries + events) while distributing changes across underused axes." + programLine);
+    safeText(intent, "Evolution intent: maintain dual-ledger memory (entries + events) while distributing changes across underused axes." + programLine + operatorLine);
     return;
   }
 
   if (model.repetition.risk === "high") {
-    safeText(intent, "Evolution intent: break repetition by shifting from panel increments into structural/runtime mutations." + programLine);
+    safeText(intent, "Evolution intent: break repetition by shifting from panel increments into structural/runtime mutations." + programLine + operatorLine);
     return;
   }
 
-  safeText(intent, "Evolution intent: continue diversification across governance, runtime, and memory axes." + programLine);
+  safeText(intent, "Evolution intent: continue diversification across governance, runtime, and memory axes." + programLine + operatorLine);
 }
 
 export function renderHome(model) {
