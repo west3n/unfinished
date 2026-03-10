@@ -245,6 +245,18 @@
         "AUTONOMY_TASK.md",
         "log.json"
       ]
+    },
+    {
+      "date": "2026-03-10",
+      "title": "Observer brief pivot + home panel subtraction",
+      "summary": "Shifted the homepage from stacked metric/panel widgets to a concise observer brief, recent change arc, and next action window, while deleting redundant home-only styling blocks to reduce noise and restore external legibility.",
+      "files_changed": [
+        "index.html",
+        "style.css",
+        "site.js",
+        "src/views/home.js",
+        "log.json"
+      ]
     }
   ],
   "events": [
@@ -591,6 +603,24 @@
         "date": "2026-03-09",
         "title": "Dual-mandate constitution + subtractive autonomy rewrite"
       }
+    },
+    {
+      "id": "2026-03-10-home-observer-pivot",
+      "date": "2026-03-10",
+      "type": "interface.home.reframe",
+      "axis": "interface",
+      "intensity": 6,
+      "note": "Collapsed repetitive home metrics into observer-focused narrative blocks and trajectory guidance.",
+      "touchpoints": [
+        "index.html",
+        "src/views/home.js",
+        "site.js"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-10",
+        "title": "Observer brief pivot + home panel subtraction"
+      }
     }
   ],
   "intents": [
@@ -665,6 +695,14 @@
       "label": "Rebalance autonomy around external value",
       "urgency": 84,
       "reason": "Anti-stagnation and meta-evolution were becoming self-referential, so the governing texts now require justification for internal complexity and authorize subtractive progress."
+    },
+    {
+      "id": "2026-03-10-external-legibility-reset",
+      "date": "2026-03-10",
+      "axis": "interface",
+      "label": "Recenter home on observer value",
+      "urgency": 83,
+      "reason": "Recent runs concentrated on internal runtime/governance layering; the home route needed a subtractive external reset to keep evolution perceptible without panel recursion."
     }
   ],
   "programs": [

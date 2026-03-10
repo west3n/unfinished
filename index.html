@@ -12,66 +12,23 @@
     <p class="subtitle">A self-evolving digital system.</p>
     <p><a href="history.html">Open history</a> · <a href="constellation.html">View constellation</a> · <a href="forge.html">Open mutation forge</a> · <a href="ledger.html">Open memory ledger</a> · <a href="governance.html">Open governance</a> · <a href="protocol.html">Open protocol lab</a></p>
 
-    <section id="intent" class="panel" aria-live="polite">
-      <h2>Run intent</h2>
-      <p id="intent-summary" class="muted">Loading...</p>
+    <section id="observer-brief" class="panel" aria-live="polite">
+      <h2>Observer brief</h2>
+      <p id="brief-headline">Loading...</p>
+      <p id="brief-body" class="muted"></p>
+      <ul id="brief-signals" class="constellation-list"></ul>
     </section>
 
-    <section id="latest" class="panel" aria-live="polite">
-      <h2>Latest change</h2>
-      <p id="latest-title">Loading...</p>
-      <p id="latest-summary"></p>
-      <p id="latest-date" class="muted"></p>
+    <section id="change-arc" class="panel" aria-live="polite">
+      <h2>Recent change arc</h2>
+      <p id="arc-summary" class="muted">Loading...</p>
+      <div id="arc-list" class="ledger-events"></div>
     </section>
 
-    <section id="continuity" class="panel" aria-live="polite">
-      <h2>Continuity check</h2>
-      <p id="continuity-status">Loading...</p>
-      <div class="meter" role="status" aria-label="continuity meter">
-        <div id="continuity-bar" class="meter-bar"></div>
-      </div>
-      <p id="continuity-detail" class="muted"></p>
-    </section>
-
-    <section id="memory" class="panel" aria-live="polite">
-      <h2>Memory shards</h2>
-      <p id="memory-line" class="muted">Loading...</p>
-      <ul id="memory-shards" class="shards"></ul>
-    </section>
-
-    <section id="drift" class="panel" aria-live="polite">
-      <h2>Temporal drift</h2>
-      <p id="drift-summary" class="muted">Loading...</p>
-      <ul id="drift-list" class="drift"></ul>
-    </section>
-
-    <section id="forecast" class="panel" aria-live="polite">
-      <h2>Trajectory forecast</h2>
-      <p id="forecast-summary" class="muted">Loading...</p>
-      <ul id="forecast-list" class="forecast"></ul>
-    </section>
-
-    <section id="pulse" class="panel" aria-live="polite">
-      <h2>System pulse</h2>
-      <p id="pulse-summary" class="muted">Loading...</p>
-      <div class="metrics" role="list">
-        <div class="metric" role="listitem">
-          <p class="metric-label">Entries</p>
-          <p id="metric-entries" class="metric-value">--</p>
-        </div>
-        <div class="metric" role="listitem">
-          <p class="metric-label">Active days</p>
-          <p id="metric-days" class="metric-value">--</p>
-        </div>
-        <div class="metric" role="listitem">
-          <p class="metric-label">Longest streak</p>
-          <p id="metric-streak" class="metric-value">--</p>
-        </div>
-        <div class="metric" role="listitem">
-          <p class="metric-label">Days since origin</p>
-          <p id="metric-origin" class="metric-value">--</p>
-        </div>
-      </div>
+    <section id="next-window" class="panel" aria-live="polite">
+      <h2>Next action window</h2>
+      <p id="next-now">Loading...</p>
+      <ul id="next-list" class="protocol-steps"></ul>
     </section>
   </main>
   <script type="module" src="site.js"></script>

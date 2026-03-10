@@ -11,11 +11,11 @@ import { renderProtocol } from "./src/views/protocol.js";
 import { byId } from "./src/shared/dom.js";
 
 function renderFailure() {
-  var latestTitle = byId("latest-title");
-  if (latestTitle) latestTitle.textContent = "Unable to load log.";
+  var headline = byId("brief-headline");
+  if (headline) headline.textContent = "Unable to load log.";
 
-  var continuity = byId("continuity-status");
-  if (continuity) continuity.textContent = "Continuity unavailable.";
+  var body = byId("brief-body");
+  if (body) body.textContent = "Observer brief unavailable.";
 
   var history = byId("history-list");
   if (history) history.innerHTML = '<p class="muted">History unavailable.</p>';

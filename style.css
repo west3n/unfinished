@@ -5,10 +5,6 @@
   --line: #d8d2c3;
   --accent: #005a4f;
   --glow: #f7e2a6;
-  --meter-track: #e7e1d6;
-  --meter-ok: #0e6a5a;
-  --meter-warn: #b0472f;
-  --meter-bg: #fffaf0;
   --chip-bg: #fffdf7;
   --chip-border: #e1d8c6;
   --chip-shadow: rgba(38, 30, 18, 0.08);
@@ -62,27 +58,6 @@ button:hover {
   border-top: 1px solid var(--line);
 }
 
-.meter {
-  margin: 0.4rem 0 0.8rem;
-  height: 12px;
-  border-radius: 999px;
-  background: var(--meter-track);
-  overflow: hidden;
-  border: 1px solid var(--line);
-  background-image: linear-gradient(90deg, transparent, var(--meter-bg));
-}
-
-.meter-bar {
-  height: 100%;
-  width: 0;
-  background: var(--meter-ok);
-  transition: width 0.8s ease, background 0.8s ease;
-}
-
-.meter-bar.warn {
-  background: var(--meter-warn);
-}
-
 .entry h3 { margin: 0 0 0.35rem; }
 .entry .date { margin: 0 0 0.5rem; color: var(--muted); }
 .files { margin: 0.5rem 0 0; padding-left: 1.1rem; }
@@ -125,112 +100,10 @@ button:hover {
   border-color: #d3c2ef;
 }
 
-.shards {
-  list-style: none;
-  margin: 0.6rem 0 0;
-  padding: 0;
-  display: grid;
-  gap: 0.6rem;
-}
-
-.shard {
-  padding: 0.8rem 0.9rem;
-  border-radius: 12px;
-  background: var(--chip-bg);
-  border: 1px solid var(--chip-border);
-  box-shadow: 0 8px 18px var(--chip-shadow);
-  animation: shardPulse 6s ease-in-out infinite;
-}
-
-.shard h3 {
-  margin: 0 0 0.2rem;
-  font-size: 1rem;
-}
-
-.shard .date {
-  margin: 0 0 0.4rem;
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-.shard p {
-  margin: 0;
-}
-
 .metrics {
   display: grid;
   gap: 0.8rem;
   margin-top: 0.8rem;
-}
-
-.forecast {
-  list-style: none;
-  margin: 0.6rem 0 0;
-  padding: 0;
-  display: grid;
-  gap: 0.7rem;
-}
-
-.forecast-item {
-  padding: 0.85rem 0.95rem;
-  border-radius: 14px;
-  border: 1px solid var(--chip-border);
-  background: linear-gradient(140deg, #fef8e8, #efe5d0);
-  box-shadow: 0 10px 18px rgba(64, 50, 28, 0.1);
-}
-
-.forecast-item h3 {
-  margin: 0 0 0.25rem;
-  font-size: 1.02rem;
-}
-
-.forecast-meta {
-  margin: 0;
-  font-size: 0.92rem;
-  color: var(--muted);
-}
-
-.drift {
-  list-style: none;
-  margin: 0.6rem 0 0;
-  padding: 0;
-  display: grid;
-  gap: 0.7rem;
-}
-
-.drift-item {
-  padding: 0.85rem 0.95rem;
-  border-radius: 16px;
-  border: 1px solid var(--chip-border);
-  background: linear-gradient(155deg, #fff6ec, #f0e7d6);
-  box-shadow: 0 12px 22px rgba(64, 46, 24, 0.12);
-  position: relative;
-  overflow: hidden;
-  animation: driftReveal 8s ease-in-out infinite;
-}
-
-.drift-item::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.55), transparent 55%);
-  opacity: 0.8;
-  pointer-events: none;
-}
-
-.drift-item h3 {
-  margin: 0 0 0.25rem;
-  font-size: 1.05rem;
-}
-
-.drift-meta {
-  margin: 0 0 0.35rem;
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-.drift-body {
-  margin: 0;
 }
 
 .metric {
@@ -468,31 +341,8 @@ button:hover {
   margin-top: 0.35rem;
 }
 
-@keyframes shardPulse {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
-}
-
-@keyframes driftReveal {
-  0%, 100% { transform: translateY(0); }
-  45% { transform: translateY(-4px); }
-  60% { transform: translateY(-1px); }
-}
-
 @media (min-width: 700px) {
-  .shards {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   .metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .forecast {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .drift {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
