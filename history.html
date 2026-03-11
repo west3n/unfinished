@@ -18,6 +18,21 @@
       <ul id="history-events" class="constellation-list"></ul>
     </section>
 
+    <section class="panel" aria-live="polite">
+      <h2>Observer impact timeline</h2>
+      <div class="history-controls">
+        <label class="control" for="history-focus-filter">
+          Focus
+          <select id="history-focus-filter">
+            <option value="all">All runs</option>
+            <option value="external">Observer-visible only</option>
+            <option value="internal">Internal-only only</option>
+          </select>
+        </label>
+      </div>
+      <p id="history-impact-summary" class="muted">Loading...</p>
+    </section>
+
     <section id="history-list" aria-live="polite">
       <p class="muted">Loading...</p>
     </section>

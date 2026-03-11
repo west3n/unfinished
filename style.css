@@ -204,6 +204,37 @@ button:hover {
   font: inherit;
 }
 
+.history-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+}
+
+.history-entry {
+  border: 1px solid var(--chip-border);
+  border-radius: 14px;
+  padding: 0.9rem 0.95rem;
+  background: linear-gradient(145deg, #fffdf8, #f3ecde);
+  box-shadow: 0 8px 16px rgba(58, 44, 24, 0.08);
+}
+
+.history-external {
+  border-color: #ecd39a;
+}
+
+.history-internal {
+  border-color: #d3c2ef;
+}
+
+.history-trace {
+  margin-top: 0.6rem;
+}
+
+.history-trace summary {
+  cursor: pointer;
+  color: var(--accent);
+}
+
 .constellation-list {
   list-style: none;
   margin: 0.6rem 0 0;

@@ -257,6 +257,17 @@
         "src/views/home.js",
         "log.json"
       ]
+    },
+    {
+      "date": "2026-03-11",
+      "title": "History impact timeline + observer/internal filter",
+      "summary": "Reframed the history route as an observer impact timeline with external-vs-internal filtering, concise impact annotations, and collapsible file traces so evolution stays legible without removing auditability.",
+      "files_changed": [
+        "history.html",
+        "style.css",
+        "src/views/history.js",
+        "log.json"
+      ]
     }
   ],
   "events": [
@@ -620,6 +631,24 @@
         "kind": "entry",
         "date": "2026-03-10",
         "title": "Observer brief pivot + home panel subtraction"
+      }
+    },
+    {
+      "id": "2026-03-11-history-impact-timeline",
+      "date": "2026-03-11",
+      "type": "interface.history.reframe",
+      "axis": "interface",
+      "intensity": 5,
+      "note": "Converted raw history feed into a filtered observer impact timeline with preserved trace details.",
+      "touchpoints": [
+        "history.html",
+        "src/views/history.js",
+        "style.css"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-11",
+        "title": "History impact timeline + observer/internal filter"
       }
     }
   ],
