@@ -67,6 +67,109 @@ function deriveImpact(entry, focus) {
   return "Internal substrate changed; observer-facing effect is indirect.";
 }
 
+function toFileList(entry) {
+  return Array.isArray(entry.files_changed) ? entry.files_changed : [];
+}
+
+function toFileSet(entry) {
+  return toFileList(entry).reduce(function (acc, file) {
+    acc[file] = true;
+    return acc;
+  }, {});
+}
+
+function runOptionLabel(item) {
+  var title = item.entry.title || "Untitled";
+  if (title.length > 56) {
+    title = title.slice(0, 53) + "...";
+  }
+  return (item.entry.date || "Unknown date") + " · " + title;
+}
+
+function compareRank(item) {
+  var id = String(item.id || "");
+  var parts = id.split("-");
+  var rank = Number(parts[1]);
+  return Number.isNaN(rank) ? 0 : rank;
+}
+
+function orderComparison(itemA, itemB) {
+  var dateA = String(itemA.entry.date || "");
+  var dateB = String(itemB.entry.date || "");
+
+  if (dateA > dateB) return { newer: itemA, older: itemB };
+  if (dateB > dateA) return { newer: itemB, older: itemA };
+
+  return compareRank(itemA) < compareRank(itemB)
+    ? { newer: itemA, older: itemB }
+    : { newer: itemB, older: itemA };
+}
+
+function summarizeDelta(newerItem, olderItem) {
+  var newerSet = toFileSet(newerItem.entry);
+  var olderSet = toFileSet(olderItem.entry);
+
+  var newerFiles = Object.keys(newerSet);
+  var olderFiles = Object.keys(olderSet);
+
+  var added = newerFiles.filter(function (file) {
+    return !olderSet[file];
+  });
+  var removed = olderFiles.filter(function (file) {
+    return !newerSet[file];
+  });
+  var shared = newerFiles.filter(function (file) {
+    return olderSet[file];
+  });
+
+  var totalDistinct = added.length + removed.length + shared.length;
+  var noveltyRatio = totalDistinct ? (added.length + removed.length) / totalDistinct : 0;
+
+  var mode = "incremental refinement";
+  if (!shared.length && (added.length || removed.length)) {
+    mode = "hard pivot";
+  } else if (noveltyRatio >= 0.7) {
+    mode = "major branch shift";
+  } else if (noveltyRatio >= 0.4) {
+    mode = "mixed refactor";
+  }
+
+  if (newerItem.focus !== olderItem.focus) {
+    mode += " with focus shift to " + newerItem.focus;
+  } else {
+    mode += " inside " + newerItem.focus + " focus";
+  }
+
+  if (newerItem.axis !== olderItem.axis) {
+    mode += " (" + axisLabel(olderItem.axis) + " to " + axisLabel(newerItem.axis) + ")";
+  }
+
+  return {
+    added: added.sort(),
+    removed: removed.sort(),
+    shared: shared.sort(),
+    noveltyRatio: noveltyRatio,
+    mode: mode
+  };
+}
+
+function renderFileBucket(title, files, emptyText, className) {
+  var bucket = create("section", "history-compare-bucket " + className);
+  bucket.appendChild(create("h4", "", title + " (" + files.length + ")"));
+
+  if (!files.length) {
+    bucket.appendChild(create("p", "muted", emptyText));
+    return bucket;
+  }
+
+  var list = create("ul", "files");
+  files.forEach(function (file) {
+    list.appendChild(create("li", "", file));
+  });
+  bucket.appendChild(list);
+  return bucket;
+}
+
 function renderLedgerRecap(model) {
   var summary = byId("history-ledger-summary");
   var events = byId("history-events");
@@ -86,6 +189,9 @@ export function renderHistory(model) {
   var root = byId("history-list");
   var summary = byId("history-impact-summary");
   var filterInput = byId("history-focus-filter");
+  var compareA = byId("history-compare-newer");
+  var compareB = byId("history-compare-older");
+  var compareRoot = byId("history-compare");
   if (!root) return;
 
   renderLedgerRecap(model);
@@ -95,16 +201,96 @@ export function renderHistory(model) {
     return acc;
   }, {});
 
-  var prepared = model.descEntries.map(function (entry) {
+  var prepared = model.descEntries.map(function (entry, index) {
     var axis = axisByDateTitle[(entry.date || "") + "|" + (entry.title || "Untitled")] || "structure";
     var focus = classifyFocus(entry, axis);
     return {
+      id: "run-" + index,
       entry: entry,
       axis: axis,
       focus: focus,
       impact: deriveImpact(entry, focus)
     };
   });
+
+  var compareLookup = prepared.reduce(function (acc, item) {
+    acc[item.id] = item;
+    return acc;
+  }, {});
+
+  function refreshComparison() {
+    if (!compareRoot || !compareA || !compareB) return;
+
+    compareRoot.innerHTML = "";
+    if (prepared.length < 2) {
+      compareRoot.appendChild(create("p", "muted", "Need at least two runs to compare."));
+      return;
+    }
+
+    var itemA = compareLookup[compareA.value];
+    var itemB = compareLookup[compareB.value];
+    if (!itemA || !itemB) {
+      compareRoot.appendChild(create("p", "muted", "Pick two runs to load the comparison."));
+      return;
+    }
+    if (itemA.id === itemB.id) {
+      compareRoot.appendChild(create("p", "muted", "Select two different runs."));
+      return;
+    }
+
+    var ordered = orderComparison(itemA, itemB);
+    var newer = ordered.newer;
+    var older = ordered.older;
+    var gap = dayDiff(older.entry.date, newer.entry.date);
+    var delta = summarizeDelta(newer, older);
+
+    compareRoot.appendChild(create(
+      "p",
+      "",
+      "A/B span: " + (older.entry.date || "Unknown") + " to " + (newer.entry.date || "Unknown") +
+      (gap !== null ? " (" + gap + " day gap)" : "")
+    ));
+    compareRoot.appendChild(create(
+      "p",
+      "muted",
+      "Newer run: " + (newer.entry.title || "Untitled") + " · Older run: " + (older.entry.title || "Untitled")
+    ));
+
+    var stats = create("ul", "history-compare-stats");
+    stats.appendChild(create("li", "", "Shared files: " + delta.shared.length));
+    stats.appendChild(create("li", "", "Added in newer run: " + delta.added.length));
+    stats.appendChild(create("li", "", "Removed since older run: " + delta.removed.length));
+    stats.appendChild(create("li", "", "File-level novelty: " + Math.round(delta.noveltyRatio * 100) + "%"));
+    compareRoot.appendChild(stats);
+    compareRoot.appendChild(create("p", "history-compare-mode", "Trajectory classification: " + delta.mode + "."));
+
+    var buckets = create("div", "history-compare-buckets");
+    buckets.appendChild(renderFileBucket("Added", delta.added, "No new files relative to the older run.", "history-compare-added"));
+    buckets.appendChild(renderFileBucket("Removed", delta.removed, "No files were dropped relative to the older run.", "history-compare-removed"));
+    buckets.appendChild(renderFileBucket("Shared", delta.shared, "No overlap between file sets.", "history-compare-shared"));
+    compareRoot.appendChild(buckets);
+  }
+
+  function seedComparisonControls() {
+    if (!compareA || !compareB) return;
+
+    compareA.innerHTML = "";
+    compareB.innerHTML = "";
+    prepared.forEach(function (item) {
+      var optionA = create("option", "", runOptionLabel(item));
+      optionA.value = item.id;
+      compareA.appendChild(optionA);
+
+      var optionB = create("option", "", runOptionLabel(item));
+      optionB.value = item.id;
+      compareB.appendChild(optionB);
+    });
+
+    if (prepared.length) {
+      compareA.value = prepared[0].id;
+      compareB.value = (prepared[1] || prepared[0]).id;
+    }
+  }
 
   function refresh() {
     var filter = filterInput ? filterInput.value : "all";
@@ -170,5 +356,14 @@ export function renderHistory(model) {
     filterInput.addEventListener("change", refresh);
   }
 
+  if (compareA) {
+    compareA.addEventListener("change", refreshComparison);
+  }
+  if (compareB) {
+    compareB.addEventListener("change", refreshComparison);
+  }
+
+  seedComparisonControls();
+  refreshComparison();
   refresh();
 }

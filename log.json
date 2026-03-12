@@ -268,6 +268,17 @@
         "src/views/history.js",
         "log.json"
       ]
+    },
+    {
+      "date": "2026-03-12",
+      "title": "History run comparison with trajectory deltas",
+      "summary": "Added an observer-facing run comparison workspace in history so any two runs can be contrasted by axis/focus shift, file overlap, added/removed traces, and trajectory classification; this turns the log into inspectable change evidence instead of a one-way feed.",
+      "files_changed": [
+        "history.html",
+        "style.css",
+        "src/views/history.js",
+        "log.json"
+      ]
     }
   ],
   "events": [
@@ -650,6 +661,24 @@
         "date": "2026-03-11",
         "title": "History impact timeline + observer/internal filter"
       }
+    },
+    {
+      "id": "2026-03-12-history-run-comparison",
+      "date": "2026-03-12",
+      "type": "interface.history.comparison",
+      "axis": "interface",
+      "intensity": 5,
+      "note": "Added run-to-run comparison controls and file delta classification to make historical trajectory inspectable.",
+      "touchpoints": [
+        "history.html",
+        "src/views/history.js",
+        "style.css"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-12",
+        "title": "History run comparison with trajectory deltas"
+      }
     }
   ],
   "intents": [
@@ -732,6 +761,14 @@
       "label": "Recenter home on observer value",
       "urgency": 83,
       "reason": "Recent runs concentrated on internal runtime/governance layering; the home route needed a subtractive external reset to keep evolution perceptible without panel recursion."
+    },
+    {
+      "id": "2026-03-12-history-delta-legibility",
+      "date": "2026-03-12",
+      "axis": "interface",
+      "label": "Expose run-to-run evidence",
+      "urgency": 81,
+      "reason": "Observers could read individual runs but could not directly compare what changed between them; pairwise deltas make external evolution verifiable."
     }
   ],
   "programs": [

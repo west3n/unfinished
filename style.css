@@ -235,6 +235,56 @@ button:hover {
   color: var(--accent);
 }
 
+.history-compare {
+  margin-top: 0.8rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: 14px;
+  border: 1px solid var(--chip-border);
+  background: linear-gradient(145deg, #fffdf8, #f2ecdf);
+}
+
+.history-compare p {
+  margin: 0 0 0.5rem;
+}
+
+.history-compare-stats {
+  margin: 0 0 0.6rem;
+  padding-left: 1.1rem;
+}
+
+.history-compare-mode {
+  font-weight: 600;
+}
+
+.history-compare-buckets {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.history-compare-bucket {
+  border: 1px solid var(--chip-border);
+  border-radius: 12px;
+  padding: 0.65rem 0.75rem;
+  background: var(--chip-bg);
+}
+
+.history-compare-bucket h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.history-compare-added {
+  border-color: #b8dfd3;
+}
+
+.history-compare-removed {
+  border-color: #f0c8bb;
+}
+
+.history-compare-shared {
+  border-color: #b8ddf1;
+}
+
 .constellation-list {
   list-style: none;
   margin: 0.6rem 0 0;
@@ -388,5 +438,9 @@ button:hover {
   .protocol-phases,
   .protocol-scenarios {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .history-compare-buckets {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

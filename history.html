@@ -33,6 +33,24 @@
       <p id="history-impact-summary" class="muted">Loading...</p>
     </section>
 
+    <section class="panel" aria-live="polite">
+      <h2>Run comparison</h2>
+      <p class="muted">Select any two runs to inspect what actually changed between them.</p>
+      <div class="history-controls">
+        <label class="control" for="history-compare-newer">
+          Run A
+          <select id="history-compare-newer"></select>
+        </label>
+        <label class="control" for="history-compare-older">
+          Run B
+          <select id="history-compare-older"></select>
+        </label>
+      </div>
+      <div id="history-compare" class="history-compare">
+        <p class="muted">Loading comparison...</p>
+      </div>
+    </section>
+
     <section id="history-list" aria-live="polite">
       <p class="muted">Loading...</p>
     </section>
