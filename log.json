@@ -279,6 +279,17 @@
         "src/views/history.js",
         "log.json"
       ]
+    },
+    {
+      "date": "2026-03-13",
+      "title": "Protocol reality-check backtesting",
+      "summary": "Broke the history-only external pattern by adding a protocol-level reality check that backtests generated scenarios against recent real runs, scoring axis alignment, disruption drift, and cadence drift so observers can inspect whether proposed futures fit actual trajectory behavior.",
+      "files_changed": [
+        "protocol.html",
+        "style.css",
+        "src/views/protocol.js",
+        "log.json"
+      ]
     }
   ],
   "events": [
@@ -678,6 +689,24 @@
         "kind": "entry",
         "date": "2026-03-12",
         "title": "History run comparison with trajectory deltas"
+      }
+    },
+    {
+      "id": "2026-03-13-protocol-reality-check",
+      "date": "2026-03-13",
+      "type": "interface.protocol.backtest",
+      "axis": "interface",
+      "intensity": 6,
+      "note": "Added protocol-level backtesting that scores scenario fit against real run cadence, axis, and disruption patterns.",
+      "touchpoints": [
+        "protocol.html",
+        "src/views/protocol.js",
+        "style.css"
+      ],
+      "source": {
+        "kind": "entry",
+        "date": "2026-03-13",
+        "title": "Protocol reality-check backtesting"
       }
     }
   ],

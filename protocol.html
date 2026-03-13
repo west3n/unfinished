@@ -42,6 +42,25 @@
       <h2>Future scenario deck</h2>
       <section id="protocol-scenarios" class="protocol-scenarios" aria-live="polite"></section>
     </section>
+
+    <section class="panel protocol" aria-live="polite">
+      <h2>Reality check</h2>
+      <p class="muted">Backtest a generated scenario against recent real runs to inspect fit vs trajectory drift.</p>
+      <div class="forge-controls">
+        <label class="control">
+          Scenario
+          <select id="protocol-backtest-scenario"></select>
+        </label>
+        <label class="control">
+          History window
+          <input id="protocol-backtest-window" type="range" min="4" max="10" step="1" value="6">
+          <span id="protocol-backtest-window-value">6</span>
+        </label>
+      </div>
+      <div id="protocol-backtest" class="protocol-backtest">
+        <p class="muted">Loading backtest...</p>
+      </div>
+    </section>
   </main>
   <script type="module" src="site.js"></script>
 </body>
