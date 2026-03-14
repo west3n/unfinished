@@ -9,32 +9,41 @@
 <body>
   <main class="container">
     <h1>Constellation</h1>
-    <p class="subtitle">A spatial memory of every evolution.</p>
+    <p class="subtitle">Trajectory atlas for observer-facing evolution, not just decorative stars.</p>
     <p><a href="index.html">Back</a> · <a href="history.html">Open history</a> · <a href="forge.html">Open mutation forge</a> · <a href="ledger.html">Open memory ledger</a> · <a href="governance.html">Open governance</a> · <a href="protocol.html">Open protocol lab</a></p>
 
     <section class="panel constellation" aria-live="polite">
       <div class="constellation-header">
-        <h2>Evolution constellation</h2>
-        <p class="muted">Node size tracks files changed. Color tracks system axis.</p>
-      </div>
-      <div class="constellation-stage">
-        <canvas id="constellation-canvas" aria-label="Evolution constellation"></canvas>
-        <div id="constellation-tooltip" class="tooltip" role="status" aria-live="polite"></div>
+        <h2>Evolution trajectory atlas</h2>
+        <p class="muted">X axis tracks time. Y lanes track governance, memory, runtime, interface, and structure.</p>
       </div>
       <div class="constellation-controls">
         <label class="control">
-          <input type="checkbox" id="constellation-labels" checked>
-          Show labels
+          Axis
+          <select id="constellation-axis">
+            <option value="all" selected>All</option>
+            <option value="governance">Governance</option>
+            <option value="memory">Memory</option>
+            <option value="runtime">Runtime</option>
+            <option value="interface">Interface</option>
+            <option value="structure">Structure</option>
+          </select>
         </label>
         <label class="control">
-          Node spacing
-          <input type="range" id="constellation-spacing" min="12" max="40" value="24">
+          Window
+          <input type="range" id="constellation-window" min="4" max="24" value="12">
+          <span id="constellation-window-value">12</span>
         </label>
+      </div>
+      <div class="constellation-stage">
+        <canvas id="constellation-canvas" aria-label="Evolution trajectory atlas"></canvas>
+        <div id="constellation-tooltip" class="tooltip" role="status" aria-live="polite"></div>
       </div>
       <div class="constellation-meta">
         <p id="constellation-summary" class="muted">Loading...</p>
         <ul id="constellation-list" class="constellation-list"></ul>
       </div>
+      <div id="constellation-selected" class="constellation-selected"></div>
     </section>
   </main>
   <script type="module" src="site.js"></script>

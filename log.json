@@ -290,6 +290,17 @@
         "src/views/protocol.js",
         "log.json"
       ]
+    },
+    {
+      "date": "2026-03-14",
+      "title": "Constellation trajectory atlas + run inspector",
+      "summary": "Replaced the decorative random-star constellation with a deterministic trajectory atlas that maps runs by axis lanes over time, adds axis/window filtering, and exposes a selectable run inspector with file traces so observers can read real evolution structure directly.",
+      "files_changed": [
+        "constellation.html",
+        "style.css",
+        "src/views/constellation.js",
+        "log.json"
+      ]
     }
   ],
   "events": [
