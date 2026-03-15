@@ -37,6 +37,38 @@ h2 { margin: 0 0 0.5rem; font-size: 1.2rem; }
 
 a { color: var(--accent); }
 
+.site-nav {
+  margin: 0 0 1rem;
+}
+
+.site-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.55rem;
+}
+
+.site-nav-link {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--chip-border);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  background: var(--chip-bg);
+  text-decoration: none;
+  color: var(--text);
+  box-shadow: 0 6px 12px var(--chip-shadow);
+}
+
+.site-nav-link-active {
+  border-color: #a8cfc7;
+  background: linear-gradient(140deg, #eefaf6, #def2ec);
+  color: #0f574b;
+  font-weight: 600;
+}
+
 button {
   border: 1px solid var(--chip-border);
   background: linear-gradient(140deg, #fff8e8, #efe2c9);

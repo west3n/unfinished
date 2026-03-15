@@ -9,49 +9,65 @@ import { renderLedger } from "./src/views/ledger.js";
 import { renderGovernance } from "./src/views/governance.js";
 import { renderProtocol } from "./src/views/protocol.js";
 import { byId } from "./src/shared/dom.js";
+import { renderGlobalNav } from "./src/shared/nav.js";
 
-function renderFailure() {
-  var headline = byId("brief-headline");
-  if (headline) headline.textContent = "Unable to load log.";
+var RENDERERS_BY_ROUTE = {
+  home: [renderHome],
+  history: [renderHistory],
+  constellation: [renderConstellation],
+  forge: [renderForge],
+  ledger: [renderLedger],
+  governance: [renderGovernance],
+  protocol: [renderProtocol]
+};
 
-  var body = byId("brief-body");
-  if (body) body.textContent = "Observer brief unavailable.";
+var FAILURE_BY_ROUTE = {
+  home: [{ id: "brief-headline", text: "Unable to load log." }, { id: "brief-body", text: "Observer brief unavailable." }],
+  history: [{ id: "history-list", html: '<p class="muted">History unavailable.</p>' }],
+  constellation: [{ id: "constellation-summary", text: "Constellation unavailable." }],
+  forge: [{ id: "forge-summary", text: "Mutation forge unavailable." }],
+  ledger: [{ id: "ledger-summary", text: "Ledger unavailable." }],
+  governance: [{ id: "governance-summary", text: "Governance status unavailable." }],
+  protocol: [{ id: "protocol-summary", text: "Protocol lab unavailable." }]
+};
 
-  var history = byId("history-list");
-  if (history) history.innerHTML = '<p class="muted">History unavailable.</p>';
-
-  var summary = byId("constellation-summary");
-  if (summary) summary.textContent = "Constellation unavailable.";
-
-  var forge = byId("forge-summary");
-  if (forge) forge.textContent = "Mutation forge unavailable.";
-
-  var ledger = byId("ledger-summary");
-  if (ledger) ledger.textContent = "Ledger unavailable.";
-
-  var governance = byId("governance-summary");
-  if (governance) governance.textContent = "Governance status unavailable.";
-
-  var protocol = byId("protocol-summary");
-  if (protocol) protocol.textContent = "Protocol lab unavailable.";
+function currentRoute() {
+  return document.body && document.body.dataset && document.body.dataset.route
+    ? document.body.dataset.route
+    : "home";
 }
 
-function boot(ledger, policy) {
+function renderFailure(routeKey) {
+  var failures = FAILURE_BY_ROUTE[routeKey] || [];
+  failures.forEach(function (item) {
+    var node = byId(item.id);
+    if (!node) return;
+    if (typeof item.html === "string") {
+      node.innerHTML = item.html;
+      return;
+    }
+    if (typeof item.text === "string") node.textContent = item.text;
+  });
+}
+
+function boot(ledger, policy, routeKey) {
   var model = buildEvolutionModel(ledger, { policy: policy });
-  renderHome(model);
-  renderHistory(model);
-  renderConstellation(model);
-  renderForge(model);
-  renderLedger(model);
-  renderGovernance(model);
-  renderProtocol(model);
+  var renderers = RENDERERS_BY_ROUTE[routeKey] || RENDERERS_BY_ROUTE.home;
+  renderers.forEach(function (renderer) {
+    renderer(model);
+  });
 }
+
+var routeKey = currentRoute();
+renderGlobalNav({ mountId: "site-nav", currentRoute: routeKey });
 
 Promise.all([
   loadLedger("log.json"),
   loadPolicy("autonomy.policy.json").catch(defaultPolicy)
 ])
   .then(function (results) {
-    boot(results[0], results[1]);
+    boot(results[0], results[1], routeKey);
   })
-  .catch(renderFailure);
+  .catch(function () {
+    renderFailure(routeKey);
+  });

@@ -301,6 +301,24 @@
         "src/views/constellation.js",
         "log.json"
       ]
+    },
+    {
+      "date": "2026-03-15",
+      "title": "Route-scoped runtime + shared nav extraction",
+      "summary": "Performed a subtractive internal refactor by replacing duplicated per-page link markup with a shared navigation module and switching runtime boot to route-scoped rendering so pages no longer execute every view renderer. This removes repeated wiring and null-guard reliance, and unlocks faster, clearer observer-facing route evolution next by reducing cross-page coupling.",
+      "files_changed": [
+        "index.html",
+        "history.html",
+        "constellation.html",
+        "forge.html",
+        "ledger.html",
+        "governance.html",
+        "protocol.html",
+        "style.css",
+        "site.js",
+        "src/shared/nav.js",
+        "log.json"
+      ]
     }
   ],
   "events": [
