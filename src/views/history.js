@@ -185,6 +185,53 @@ function renderLedgerRecap(model) {
   });
 }
 
+function summarizeTouchGaps(matches) {
+  if (matches.length < 2) {
+    return { average: 0, min: 0, max: 0 };
+  }
+
+  var gaps = [];
+  for (var i = 1; i < matches.length; i += 1) {
+    var gap = dayDiff(matches[i - 1].entry.date, matches[i].entry.date);
+    if (gap !== null) gaps.push(gap);
+  }
+  if (!gaps.length) {
+    return { average: 0, min: 0, max: 0 };
+  }
+
+  var total = gaps.reduce(function (sum, value) {
+    return sum + value;
+  }, 0);
+  return {
+    average: total / gaps.length,
+    min: Math.min.apply(Math, gaps),
+    max: Math.max.apply(Math, gaps)
+  };
+}
+
+function coChangeRanking(matches, query) {
+  var map = {};
+  var queryLower = String(query || "").toLowerCase();
+
+  matches.forEach(function (item) {
+    toFileList(item.entry).forEach(function (file) {
+      var lower = String(file || "").toLowerCase();
+      if (!lower || lower.includes(queryLower)) return;
+      map[file] = (map[file] || 0) + 1;
+    });
+  });
+
+  return Object.keys(map)
+    .map(function (file) {
+      return { file: file, count: map[file] };
+    })
+    .sort(function (a, b) {
+      if (b.count !== a.count) return b.count - a.count;
+      return a.file.localeCompare(b.file);
+    })
+    .slice(0, 6);
+}
+
 export function renderHistory(model) {
   var root = byId("history-list");
   var summary = byId("history-impact-summary");
@@ -192,6 +239,9 @@ export function renderHistory(model) {
   var compareA = byId("history-compare-newer");
   var compareB = byId("history-compare-older");
   var compareRoot = byId("history-compare");
+  var traceQuery = byId("history-trace-query");
+  var traceSummary = byId("history-trace-summary");
+  var traceResults = byId("history-trace-results");
   if (!root) return;
 
   renderLedgerRecap(model);
@@ -292,6 +342,86 @@ export function renderHistory(model) {
     }
   }
 
+  function seedTraceQuery() {
+    if (!traceQuery || traceQuery.value) return;
+    var seed = model.dominantFiles && model.dominantFiles.length ? model.dominantFiles[0] : "";
+    traceQuery.value = seed;
+  }
+
+  function refreshTraceExplorer() {
+    if (!traceQuery || !traceSummary || !traceResults) return;
+
+    var query = String(traceQuery.value || "").trim();
+    traceResults.innerHTML = "";
+
+    if (!query) {
+      safeText(traceSummary, "Enter a file path fragment to load trace evidence.");
+      traceResults.appendChild(create("p", "muted", "Example: src/views/history.js or style.css"));
+      return;
+    }
+
+    var queryLower = query.toLowerCase();
+    var matches = prepared
+      .filter(function (item) {
+        return toFileList(item.entry).some(function (file) {
+          return String(file || "").toLowerCase().includes(queryLower);
+        });
+      })
+      .slice()
+      .reverse();
+
+    if (!matches.length) {
+      safeText(traceSummary, "No runs touched files matching \"" + query + "\".");
+      traceResults.appendChild(create("p", "muted", "Try a broader prefix like src/views/ or src/core/."));
+      return;
+    }
+
+    var oldest = matches[0];
+    var newest = matches[matches.length - 1];
+    var gaps = summarizeTouchGaps(matches);
+    var share = Math.round(matches.length / Math.max(1, prepared.length) * 100);
+    safeText(
+      traceSummary,
+      "Matched " + matches.length + " run(s) (" + share + "% of history), from " +
+      (oldest.entry.date || "Unknown") + " to " + (newest.entry.date || "Unknown") +
+      ". Avg return gap: " + gaps.average.toFixed(1) + " day(s), min " + gaps.min + ", max " + gaps.max + "."
+    );
+
+    var coChanges = coChangeRanking(matches, query);
+    var stats = create("ul", "history-compare-stats");
+    stats.appendChild(create("li", "", "Latest touch: " + (newest.entry.date || "Unknown date")));
+    stats.appendChild(create("li", "", "Latest run title: " + (newest.entry.title || "Untitled")));
+    stats.appendChild(create("li", "", "Focus split: " + matches.filter(function (item) { return item.focus === "external"; }).length + " external / " + matches.filter(function (item) { return item.focus === "internal"; }).length + " internal."));
+    traceResults.appendChild(stats);
+
+    var coChangeSection = create("section", "history-cochange");
+    coChangeSection.appendChild(create("h3", "", "Frequent co-changes"));
+    if (!coChanges.length) {
+      coChangeSection.appendChild(create("p", "muted", "No stable co-change files in this slice."));
+    } else {
+      var coList = create("ul", "files");
+      coChanges.forEach(function (item) {
+        coList.appendChild(create("li", "", item.file + " (" + item.count + ")"));
+      });
+      coChangeSection.appendChild(coList);
+    }
+    traceResults.appendChild(coChangeSection);
+
+    var matchSection = create("section", "history-trace-match-list");
+    matchSection.appendChild(create("h3", "", "Matching runs"));
+    var matchList = create("div", "history-trace-cards");
+    matches.slice().reverse().forEach(function (item) {
+      var entry = item.entry;
+      var card = create("article", "history-trace-card");
+      card.appendChild(create("h4", "", (entry.date || "Unknown date") + " · " + (entry.title || "Untitled")));
+      card.appendChild(create("p", "muted", "Axis: " + axisLabel(item.axis) + " · Focus: " + item.focus));
+      card.appendChild(create("p", "", entry.summary || "No summary provided."));
+      matchList.appendChild(card);
+    });
+    matchSection.appendChild(matchList);
+    traceResults.appendChild(matchSection);
+  }
+
   function refresh() {
     var filter = filterInput ? filterInput.value : "all";
     var filtered = prepared.filter(function (item) {
@@ -362,8 +492,13 @@ export function renderHistory(model) {
   if (compareB) {
     compareB.addEventListener("change", refreshComparison);
   }
+  if (traceQuery) {
+    traceQuery.addEventListener("input", refreshTraceExplorer);
+  }
 
   seedComparisonControls();
+  seedTraceQuery();
   refreshComparison();
+  refreshTraceExplorer();
   refresh();
 }

@@ -51,6 +51,21 @@
       </div>
     </section>
 
+    <section class="panel" aria-live="polite">
+      <h2>File trace explorer</h2>
+      <p class="muted">Inspect evolution by artifact to see when a path changed, how often it returns, and what it tends to co-change with.</p>
+      <div class="history-controls">
+        <label class="control" for="history-trace-query">
+          File path contains
+          <input id="history-trace-query" type="text" placeholder="src/views/history.js">
+        </label>
+      </div>
+      <p id="history-trace-summary" class="muted">Loading trace explorer...</p>
+      <div id="history-trace-results" class="history-trace-results">
+        <p class="muted">Loading trace results...</p>
+      </div>
+    </section>
+
     <section id="history-list" aria-live="polite">
       <p class="muted">Loading...</p>
     </section>

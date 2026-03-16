@@ -319,6 +319,17 @@
         "src/shared/nav.js",
         "log.json"
       ]
+    },
+    {
+      "date": "2026-03-16",
+      "title": "History file-trace explorer for artifact-centric audits",
+      "summary": "Extended the history route with a file trace explorer so observers can query any path fragment and inspect matching runs, touch cadence, external/internal split, and frequent co-change files. This adds an artifact-centric reading mode that complements run-to-run comparison and makes evolution legible beyond chronology.",
+      "files_changed": [
+        "history.html",
+        "style.css",
+        "src/views/history.js",
+        "log.json"
+      ]
     }
   ],
   "events": [
